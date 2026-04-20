@@ -145,6 +145,47 @@ main{position:relative;z-index:2}
   color:var(--ink-soft);
 }
 
+.hero-cta{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  margin-top:32px;
+  padding:14px 22px;
+  background:var(--ink);
+  color:var(--bg);
+  text-decoration:none;
+  border-radius:100px;
+  transition:background 0.3s,transform 0.3s;
+  align-self:flex-start;
+  width:auto;
+  white-space:nowrap;
+}
+.hero-cta:hover{
+  background:var(--accent);
+  transform:translateX(6px);
+}
+.cta-arrow{
+  font-family:'DM Serif Display',serif;
+  font-size:1.1rem;
+  font-style:italic;
+  line-height:1;
+}
+.cta-main{
+  font-family:'Shippori Mincho',serif;
+  font-size:0.9rem;
+  font-weight:700;
+  line-height:1;
+}
+.cta-url{
+  font-family:'Space Grotesk',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.05em;
+  opacity:0.55;
+  line-height:1;
+  padding-left:6px;
+  border-left:1px solid rgba(255,255,255,0.2);
+}
+
 .hero-bottom{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
@@ -855,6 +896,12 @@ section{scroll-margin-top:70px}
       話しかけるだけで、デザインができる。<br>
       mor.Groupスタッフのための、はじめてのClaude Design入門。
     </p>
+
+    <a href="https://claude.ai/design" target="_blank" rel="noopener" class="hero-cta">
+      <span class="cta-arrow">→</span>
+      <span class="cta-main">Claude Designを開く</span>
+      <span class="cta-url">claude.ai/design</span>
+    </a>
   </div>
 
   <div class="hero-bottom">
