@@ -352,6 +352,12 @@ const QUESTIONS = [
     placeholder: '具体的にどう接するか、200字以内で',
     maxLength: 200,
   },
+  {
+    id: 'q_effort', type: 'episode', category: 'grit',
+    question: '今までの人生で一番努力したこと・頑張ったことは何ですか？',
+    placeholder: 'いつ・何を・どれくらいの期間・なぜ頑張れたか、300字以内で',
+    maxLength: 300,
+  },
 ];
 
 // ========== 採点ロジック ==========
