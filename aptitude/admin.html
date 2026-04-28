@@ -70,12 +70,15 @@ body{
   margin-bottom:14px;
 }
 .avatar{
-  width:42px;height:42px;border-radius:50%;
+  width:46px;height:46px;border-radius:50%;
   background:var(--bg);
   display:flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:16px;color:var(--ink);
+  font-weight:700;font-size:24px;color:var(--ink);
   flex-shrink:0;
+  border:2px solid var(--avatar-color,var(--line));
+  box-shadow:0 2px 6px rgba(0,0,0,.04);
 }
+.avatar.initial{font-size:16px}
 .candidate-info{flex:1;min-width:0}
 .candidate-name{font-size:16px;font-weight:700;margin-bottom:2px}
 .candidate-time{font-size:11px;color:var(--ink-soft)}
@@ -160,22 +163,6 @@ body{
 .detail-row:last-child{border-bottom:none}
 .detail-label{color:var(--ink-soft)}
 .detail-value{font-weight:500}
-
-.summary-box{
-  background:linear-gradient(135deg,var(--ink),#3a3a3a);
-  color:#fff;border-radius:14px;padding:20px;
-  margin-bottom:14px;
-}
-.summary-box .rank-display{
-  font-size:32px;font-weight:700;
-  font-family:'Cormorant Garamond',serif;
-  letter-spacing:.05em;
-}
-.summary-box .stars{font-size:16px;letter-spacing:.1em;margin-top:4px;color:var(--accent)}
-.summary-box .reason{
-  font-size:13px;color:rgba(255,255,255,.7);
-  margin-top:10px;line-height:1.7;
-}
 
 /* タイプ診断カード */
 .type-card{
@@ -376,16 +363,17 @@ function renderList() {
   }
 
   listEl.innerHTML = list.map((r) => {
-    const initial = (r.name || '?').charAt(0);
+    const t = r.recommendation.type || diagnoseType(r.scores);
+    const fitColor = (typeof FIT_COLORS !== 'undefined' && FIT_COLORS[t.fit]) || '#888';
     return `
       <div class="candidate" onclick="openDetail('${r.id}')">
         <div class="candidate-head">
-          <div class="avatar">${initial}</div>
+          <div class="avatar" style="--avatar-color:${fitColor}">${t.icon}</div>
           <div class="candidate-info">
             <div class="candidate-name">${escape(r.name)}</div>
-            <div class="candidate-time">${formatDate(r.submittedAt)} 受験 • 所要 ${Math.round(r.totalTimeMs / 1000)}秒</div>
+            <div class="candidate-time">${formatDate(r.submittedAt)} • 所要 ${Math.round(r.totalTimeMs / 1000)}秒</div>
           </div>
-          <div class="rank" style="background:${r.recommendation.color}">${r.recommendation.rank}</div>
+          <div class="rank" style="background:${fitColor}">${escape(t.name)}</div>
         </div>
         <div class="scores">
           ${scoreBar('主体性', r.scores.initiative)}
@@ -613,96 +601,118 @@ function clearAll() {
   renderList();
 }
 
-// デモ用ダミーデータ
+// デモ用ダミーデータ ── 主要タイプを網羅
 function seedDemo() {
   const samples = [
     {
       name: '田中 さくら',
-      pattern: 'ideal', // 主体性◎協調性◎楽観性◎
-      fun: '友達と海に行ってめっちゃ楽しかった！夕日が最高で笑いっぱなしでした。',
-    },
-    {
-      name: '佐藤 みか',
-      pattern: 'liar', // 取り繕い高
-      fun: 'カフェに行って勉強しました。集中できて良かったです。',
-    },
-    {
-      name: '鈴木 あや',
-      pattern: 'detail', // 慎重型
-      fun: '友人と食事をしました。お店選びに時間をかけたので、満足のいくお店に行けて良かったです。料理の味も雰囲気も期待通りで、写真もたくさん撮りました。次はもっと予約を早めにしようと思います。',
+      prefs: { initiative: 1.5, optimism: 1.5, cooperation: 1.7, communication: 0.5, flexibility: 1.5, resilience: 1.0 }, // → 太陽
+      lieRate: 0,
+      timeBase: 2000,
+      fun: '友達と海行ってめっちゃ楽しかった！夕日最高で笑いっぱなし、写真も撮りまくった〜🌊',
+      friend: 'いつも笑ってる人',
+      difficult: 'まずその人の良いとこ探してみる！合わないとこは気にしすぎず、仕事は仕事って割り切る。挨拶してたら意外な共通点見つかったりするから、自分から話しかけてみるかな〜',
     },
     {
       name: '高橋 ゆい',
-      pattern: 'cooperative', // 協調性◎
-      fun: '友達の誕生日サプライズを企画して、みんなで成功させたとき！喜んでくれて嬉しかった。',
+      prefs: { cooperation: 1.4, optimism: 1.0, communication: 1.2 }, // → 桜
+      lieRate: 0,
+      timeBase: 3500,
+      fun: '友達の誕生日サプライズ企画して、みんなで成功させたとき！喜んでくれて本当に嬉しかった。',
+      friend: '優しい人、聞き上手',
+      difficult: '相手のペースを尊重しながら、少しずつ距離を縮めていきます。無理に合わせるんじゃなくて、お互い心地よい関係を見つけたい。困ってたら声かけて、信頼を積み重ねていきます。',
+    },
+    {
+      name: '渡辺 れい',
+      prefs: { initiative: 1.5, optimism: 1.2, cooperation: -0.5 }, // → 流星
+      lieRate: 0,
+      timeBase: 1800,
+      fun: '一人で旅行行って、知らない街で気になった店全部入って大満足だった！自由って最高。',
+      friend: 'マイペース、ぶれない人',
+      difficult: '基本気にしないで自分の仕事に集中する。最低限の連携だけはちゃんとやって、結果で示すタイプ。合う合わないより成果が大事だと思ってる。',
+    },
+    {
+      name: '鈴木 あや',
+      prefs: { detail: 2.0, resilience: 2.5, cooperation: -0.5 }, // → 岩
+      lieRate: 0.1,
+      timeBase: 8500,
+      fun: '友人と食事をしました。お店選びに時間をかけたので、満足のいくお店に行けて良かったです。料理の味も雰囲気も期待通りで、写真もたくさん撮りました。次はもっと予約を早めにしようと思います。',
+      friend: '真面目、几帳面な人',
+      difficult: 'まず相手の言動をよく観察して、何が苦手なのか具体的に分析します。その上で、自分が変えられる部分と相手に伝えるべき部分を切り分けて、必要であれば直接話し合いの場を持つようにします。事前にメモを準備して臨みます。',
+    },
+    {
+      name: '佐藤 みか',
+      prefs: { cooperation: 1.0, optimism: 0.8 }, // → 桜寄り、ただしlie大量
+      lieRate: 1.0, // 全部はい → 霧
+      timeBase: 5000,
+      fun: 'カフェに行って勉強しました。集中できて良かったです。',
+      friend: '完璧、欠点がない人',
+      difficult: '苦手なタイプの人はいないので、誰とでもうまくやれます。私はいつも前向きですし、人の悪いところを見つけることもないので問題は起きません。',
+    },
+    {
+      name: '中村 みお',
+      prefs: { optimism: -1.0, resilience: -1.0, detail: 0.8 }, // → 雨
+      lieRate: 0.1,
+      timeBase: 11000,
+      fun: '特に何もなかった気がします…仕事で疲れてて、家で寝てたくらいかも。',
+      friend: '心配性',
+      difficult: '正直しんどいです。気を遣いすぎて疲れちゃうし、寝る前に思い出して落ち込むタイプ。なるべく関わらないようにして、必要な時だけ最小限話すようにすると思います。',
     },
   ];
 
+  const list = getResponses();
   for (const s of samples) {
-    const answers = generatePattern(s.pattern, s.fun);
+    const answers = generatePattern(s.prefs, s.lieRate, s.timeBase, {
+      q_fun: s.fun, q_friend: s.friend, q_difficult: s.difficult,
+    });
     answers['q_name'] = { value: s.name, timeMs: 4000 };
     const scores = scoreResponse(answers);
     const rec = getRecommendation(scores);
-
-    const submission = {
+    list.push({
       id: 'r_demo_' + Math.random().toString(36).slice(2, 9),
       name: s.name,
       submittedAt: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString(),
-      totalTimeMs: 180000 + Math.random() * 120000,
+      totalTimeMs: 180000 + Math.random() * 180000,
       answers,
       questionTimes: Object.fromEntries(Object.entries(answers).map(([k, v]) => [k, v.timeMs])),
       scores,
       recommendation: rec,
-    };
-    const list = getResponses();
-    list.push(submission);
-    localStorage.setItem('aptitude_responses', JSON.stringify(list));
+    });
   }
+  localStorage.setItem('aptitude_responses', JSON.stringify(list));
   renderList();
 }
 
-function generatePattern(pattern, fun, friendLabel = 'いつも明るい人') {
+// preferences(prefs)を最大化する選択肢を選ぶ
+// prefs: {trait: weight} 例 {initiative: 1.2, detail: -0.5}
+// lieRate: 0-1, ライスケールで「はい」を選ぶ確率
+// timeBaseMs: 1問あたりの基準回答時間
+function generatePattern(prefs, lieRate, timeBaseMs, episodes) {
   const answers = {};
-  // ideal: 主体性・協調性・楽観性をバランスよく選ぶための疑似乱数（質問IDベースで決定的）
-  let counter = 0;
   for (const q of QUESTIONS) {
     if (q.type === 'text') continue;
-    if (q.id === 'q_fun') {
-      answers[q.id] = { value: fun, timeMs: 30000 + Math.random() * 30000 };
+    if (q.type === 'episode') {
+      const text = (episodes && episodes[q.id]) || '';
+      answers[q.id] = { value: text, timeMs: 20000 + Math.random() * 30000 };
       continue;
     }
-    if (q.id === 'q_friend') {
-      answers[q.id] = { value: friendLabel, timeMs: 12000 };
-      continue;
-    }
-
     let chosen;
-    if (q.type === 'forced-choice') {
-      if (pattern === 'ideal') {
-        if (q.category === 'lie-scale') {
-          chosen = q.options.find((o) => o.value === 'no');
-        } else {
-          // 良い特性を持つ選択肢の中で、ローテーションでバランス良く選ぶ
-          const targets = ['optimism', 'initiative', 'cooperation'];
-          const good = q.options.filter((o) => targets.some((t) => o.traits[t]));
-          if (good.length === 0) chosen = q.options[0];
-          else if (good.length === 1) chosen = good[0];
-          else { chosen = good[counter % good.length]; counter++; }
+    if (q.category === 'lie-scale') {
+      chosen = q.options.find((o) => o.value === (Math.random() < lieRate ? 'yes' : 'no'));
+    } else {
+      let bestScore = -Infinity;
+      for (const opt of q.options) {
+        let score = 0;
+        for (const [trait, val] of Object.entries(opt.traits || {})) {
+          const w = prefs[trait];
+          if (w !== undefined) score += w * val;
         }
-      } else if (pattern === 'liar') {
-        if (q.category === 'lie-scale') chosen = q.options.find((o) => o.value === 'yes');
-        else chosen = q.options.find((o) => o.traits.cooperation) || q.options[0];
-      } else if (pattern === 'detail') {
-        chosen = q.options.find((o) => o.traits.detail) || q.options[0];
-        if (q.category === 'lie-scale') chosen = q.options.find((o) => o.value === 'no');
-      } else if (pattern === 'cooperative') {
-        chosen = q.options.find((o) => o.traits.cooperation) || q.options.find((o) => o.traits.optimism) || q.options[0];
-        if (q.category === 'lie-scale') chosen = q.options.find((o) => o.value === 'no');
+        score += (Math.random() - 0.5) * 0.1; // 同点時のばらけ用
+        if (score > bestScore) { bestScore = score; chosen = opt; }
       }
-      if (!chosen) chosen = q.options[0];
-      const baseTime = pattern === 'ideal' ? 2000 : pattern === 'detail' ? 8000 : 4000;
-      answers[q.id] = { value: chosen.value, timeMs: baseTime + Math.random() * 4000 };
     }
+    if (!chosen) chosen = q.options[0];
+    answers[q.id] = { value: chosen.value, timeMs: timeBaseMs + Math.random() * 4000 };
   }
   return answers;
 }
