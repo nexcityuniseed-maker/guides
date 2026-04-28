@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eye mor 管理ダッシュボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f1ea;
+  --ink:#1a1a1a;
+  --ink-soft:#5a5a5a;
+  --paper:#ffffff;
+  --accent:#ff5b3a;
+  --gold:#b8923f;
+  --line:rgba(0,0,0,0.08);
+  --good:#27ae60;
+  --warn:#e67e22;
+  --bad:#c0392b;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"palt";
+  padding-bottom:60px;
+}
+
+/* ヘッダー */
+.header{
+  background:var(--ink);color:#fff;
+  padding:24px 20px 28px;
+  position:sticky;top:0;z-index:50;
+}
+.header .brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;font-weight:600;letter-spacing:.06em;
+}
+.header .sub{
+  font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.6);
+  margin-top:2px;
+}
+.header h1{
+  font-size:18px;font-weight:700;margin-top:14px;
+}
+.stats{
+  display:flex;gap:14px;margin-top:14px;
+}
+.stat{flex:1;background:rgba(255,255,255,.08);padding:10px 12px;border-radius:10px}
+.stat-label{font-size:10px;letter-spacing:.1em;opacity:.6;margin-bottom:2px}
+.stat-value{font-size:20px;font-weight:700}
+
+/* 一覧 */
+.list{padding:16px}
+.candidate{
+  background:var(--paper);
+  border-radius:14px;
+  padding:18px;margin-bottom:12px;
+  border:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+  cursor:pointer;
+  transition:transform .15s, box-shadow .15s;
+}
+.candidate:active{transform:scale(.99)}
+.candidate-head{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:14px;
+}
+.avatar{
+  width:42px;height:42px;border-radius:50%;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:16px;color:var(--ink);
+  flex-shrink:0;
+}
+.candidate-info{flex:1;min-width:0}
+.candidate-name{font-size:16px;font-weight:700;margin-bottom:2px}
+.candidate-time{font-size:11px;color:var(--ink-soft)}
+.rank{
+  padding:4px 10px;border-radius:999px;
+  font-size:11px;font-weight:700;color:#fff;
+  white-space:nowrap;
+}
+
+/* スコアバー */
+.score-row{
+  display:flex;align-items:center;gap:10px;
+  padding:4px 0;font-size:12px;
+}
+.score-label{
+  width:60px;color:var(--ink-soft);font-weight:500;
+}
+.score-bar-wrap{flex:1;height:6px;background:rgba(0,0,0,.05);border-radius:999px;overflow:hidden}
+.score-bar{
+  height:100%;background:var(--accent);
+  border-radius:999px;transition:width .8s cubic-bezier(.65,0,.35,1);
+}
+.score-bar.lie{background:var(--bad)}
+.score-num{
+  width:30px;text-align:right;
+  font-weight:700;font-size:13px;
+}
+
+.empty{
+  text-align:center;padding:80px 20px;
+  color:var(--ink-soft);
+}
+.empty .ico{font-size:48px;margin-bottom:14px;opacity:.4}
+.empty h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.empty p{font-size:13px;line-height:1.7}
+.empty .demo-btn{
+  background:var(--ink);color:#fff;
+  padding:10px 20px;border-radius:999px;
+  border:none;margin-top:18px;font-size:13px;
+  font-family:inherit;cursor:pointer;font-weight:700;
+}
+
+/* 詳細モーダル */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:200;display:none;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+}
+.modal-bg.active{display:block}
+.modal{
+  position:fixed;inset:0;background:var(--bg);
+  z-index:201;overflow-y:auto;
+  display:none;
+}
+.modal.active{display:block}
+.modal-head{
+  background:var(--ink);color:#fff;
+  padding:18px 20px;
+  position:sticky;top:0;z-index:1;
+  display:flex;align-items:center;gap:12px;
+}
+.close-btn{
+  background:rgba(255,255,255,.1);
+  color:#fff;border:none;width:32px;height:32px;
+  border-radius:50%;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-body{padding:20px;max-width:600px;margin:0 auto}
+.section{
+  background:var(--paper);border-radius:14px;
+  padding:18px;margin-bottom:14px;
+  border:1px solid var(--line);
+}
+.section-title{
+  font-size:11px;letter-spacing:.2em;color:var(--accent);
+  font-weight:700;margin-bottom:12px;
+}
+.detail-row{
+  display:flex;justify-content:space-between;
+  padding:6px 0;font-size:13px;border-bottom:1px solid var(--line);
+}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--ink-soft)}
+.detail-value{font-weight:500}
+
+.summary-box{
+  background:linear-gradient(135deg,var(--ink),#3a3a3a);
+  color:#fff;border-radius:14px;padding:20px;
+  margin-bottom:14px;
+}
+.summary-box .rank-display{
+  font-size:32px;font-weight:700;
+  font-family:'Cormorant Garamond',serif;
+  letter-spacing:.05em;
+}
+.summary-box .stars{font-size:16px;letter-spacing:.1em;margin-top:4px;color:var(--accent)}
+.summary-box .reason{
+  font-size:13px;color:rgba(255,255,255,.7);
+  margin-top:10px;line-height:1.7;
+}
+
+.warn-box{
+  background:#fff4e8;border:1px solid var(--warn);
+  border-radius:10px;padding:12px 14px;font-size:13px;
+  color:#8a4d18;margin-top:10px;line-height:1.7;
+}
+.warn-box.danger{background:#ffe8e5;border-color:var(--bad);color:#8a2820}
+.warn-box .label{font-weight:700;margin-bottom:4px;display:block}
+
+.qa-item{
+  padding:12px 0;border-bottom:1px solid var(--line);
+}
+.qa-item:last-child{border-bottom:none}
+.qa-q{font-size:13px;color:var(--ink-soft);margin-bottom:6px;line-height:1.6}
+.qa-a{font-size:14px;font-weight:500;line-height:1.6}
+.qa-meta{font-size:11px;color:var(--ink-soft);margin-top:4px}
+.qa-meta .fast{color:var(--good)}
+.qa-meta .slow{color:var(--warn)}
+.qa-tag{
+  display:inline-block;padding:2px 8px;border-radius:999px;
+  font-size:10px;font-weight:700;margin-left:6px;
+  background:var(--bg);
+}
+.qa-tag.lie{background:#ffe8e5;color:var(--bad)}
+.episode-text{
+  background:var(--bg);padding:12px 14px;border-radius:10px;
+  font-size:14px;line-height:1.8;margin-top:6px;
+}
+.keyword-pill{
+  display:inline-block;padding:2px 8px;border-radius:999px;
+  font-size:11px;font-weight:500;margin:2px;
+}
+.keyword-pill.pos{background:#e6f7ed;color:var(--good)}
+.keyword-pill.neg{background:#ffe8e5;color:var(--bad)}
+
+.action-row{
+  display:flex;gap:8px;padding:14px 0;
+}
+.action-btn{
+  flex:1;background:var(--paper);
+  border:1px solid var(--line);border-radius:10px;
+  padding:10px;font-size:12px;font-weight:700;
+  font-family:inherit;cursor:pointer;color:var(--ink);
+}
+.action-btn.danger{color:var(--bad);border-color:var(--bad)}
+
+/* デモコントロール */
+.demo-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--ink);color:#fff;
+  padding:10px 16px;
+  display:flex;gap:8px;align-items:center;
+  font-size:11px;z-index:60;
+  border-top:1px solid rgba(255,255,255,.1);
+}
+.demo-bar .label{flex:1;opacity:.7;letter-spacing:.05em}
+.demo-bar button{
+  background:rgba(255,255,255,.1);color:#fff;
+  border:1px solid rgba(255,255,255,.2);
+  padding:6px 12px;border-radius:6px;
+  font-size:11px;font-family:inherit;cursor:pointer;
+  font-weight:500;
+}
+.demo-bar button:hover{background:rgba(255,255,255,.2)}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">eye mor</div>
+  <div class="sub">ADMIN DASHBOARD</div>
+  <h1>適性検査 受験者一覧</h1>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">TOTAL</div>
+      <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">RECOMMENDED</div>
+      <div class="stat-value" id="statRec">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">CAUTION</div>
+      <div class="stat-value" id="statWarn">0</div>
+    </div>
+  </div>
+</header>
+
+<div class="list" id="list"></div>
+
+<div class="modal-bg" id="modalBg" onclick="closeModal()"></div>
+<div class="modal" id="modal">
+  <div class="modal-head">
+    <button class="close-btn" onclick="closeModal()">×</button>
+    <div>
+      <div style="font-size:11px;letter-spacing:.2em;opacity:.6">CANDIDATE DETAIL</div>
+      <div style="font-size:16px;font-weight:700;margin-top:2px" id="modalName"></div>
+    </div>
+  </div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+
+<div class="demo-bar">
+  <span class="label">DEMO MODE — localStorage保存</span>
+  <button onclick="seedDemo()">デモデータ追加</button>
+  <button onclick="clearAll()">全削除</button>
+  <button onclick="window.location.href='index.html'">フォーム→</button>
+</div>
+
+<script src="questions.js"></script>
+<script>
+function getResponses() {
+  return JSON.parse(localStorage.getItem('aptitude_responses') || '[]');
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  const m = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  const h = d.getHours().toString().padStart(2, '0');
+  const min = d.getMinutes().toString().padStart(2, '0');
+  return `${m}/${day} ${h}:${min}`;
+}
+
+function renderList() {
+  const list = getResponses().sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+  const listEl = document.getElementById('list');
+  document.getElementById('statTotal').textContent = list.length;
+  document.getElementById('statRec').textContent = list.filter((r) => r.recommendation.stars >= 4).length;
+  document.getElementById('statWarn').textContent = list.filter((r) => r.recommendation.stars <= 2 || r.scores.lie >= 67).length;
+
+  if (list.length === 0) {
+    listEl.innerHTML = `
+      <div class="empty">
+        <div class="ico">◌</div>
+        <h3>まだ受験者がいません</h3>
+        <p>下の「フォーム→」から検査を試すか、<br>「デモデータ追加」でサンプルを表示できます</p>
+        <button class="demo-btn" onclick="seedDemo()">デモデータを追加</button>
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = list.map((r) => {
+    const initial = (r.name || '?').charAt(0);
+    return `
+      <div class="candidate" onclick="openDetail('${r.id}')">
+        <div class="candidate-head">
+          <div class="avatar">${initial}</div>
+          <div class="candidate-info">
+            <div class="candidate-name">${escape(r.name)}</div>
+            <div class="candidate-time">${formatDate(r.submittedAt)} 受験 • 所要 ${Math.round(r.totalTimeMs / 1000)}秒</div>
+          </div>
+          <div class="rank" style="background:${r.recommendation.color}">${r.recommendation.rank}</div>
+        </div>
+        <div class="scores">
+          ${scoreBar('主体性', r.scores.initiative)}
+          ${scoreBar('協調性', r.scores.cooperation)}
+          ${scoreBar('楽観性', r.scores.optimism)}
+          ${r.scores.lie >= 50 ? scoreBar('取り繕い', r.scores.lie, true) : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function scoreBar(label, val, isLie = false) {
+  return `
+    <div class="score-row">
+      <div class="score-label">${label}</div>
+      <div class="score-bar-wrap"><div class="score-bar ${isLie ? 'lie' : ''}" style="width:${val}%"></div></div>
+      <div class="score-num">${val}</div>
+    </div>
+  `;
+}
+
+function escape(s) {
+  return String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function openDetail(id) {
+  const r = getResponses().find((x) => x.id === id);
+  if (!r) return;
+  document.getElementById('modalName').textContent = r.name;
+
+  const body = document.getElementById('modalBody');
+
+  // 平均回答時間
+  const times = Object.values(r.questionTimes || {}).filter((t) => t > 0);
+  const avgTime = times.length ? Math.round(times.reduce((a, b) => a + b, 0) / times.length / 1000 * 10) / 10 : 0;
+
+  body.innerHTML = `
+    <div class="summary-box">
+      <div style="font-size:11px;letter-spacing:.2em;opacity:.6">RECOMMENDATION</div>
+      <div class="rank-display">${r.recommendation.rank}</div>
+      <div class="stars">${'★'.repeat(r.recommendation.stars)}${'☆'.repeat(5 - r.recommendation.stars)}</div>
+      <div class="reason">${r.recommendation.reason}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">SCORE BREAKDOWN</div>
+      ${scoreBar('主体性', r.scores.initiative)}
+      ${scoreBar('協調性', r.scores.cooperation)}
+      ${scoreBar('楽観性', r.scores.optimism)}
+      ${scoreBar('慎重さ', r.scores.detail)}
+      ${scoreBar('取り繕い', r.scores.lie, true)}
+    </div>
+
+    ${r.scores.lie >= 67 ? `
+      <div class="warn-box danger">
+        <span class="label">⚠ 取り繕い傾向が高い</span>
+        ライスケール（嘘発見質問）で「はい」を多く選択しています。回答を額面通り信用しない方が良いです。
+      </div>
+    ` : ''}
+
+    ${r.scores.optimism < 30 ? `
+      <div class="warn-box">
+        <span class="label">⚠ 楽観性が低い</span>
+        eye morの欲しい人物像（ポジティブで楽観的）から離れる可能性があります。
+      </div>
+    ` : ''}
+
+    <div class="section">
+      <div class="section-title">META</div>
+      <div class="detail-row">
+        <span class="detail-label">受験日時</span>
+        <span class="detail-value">${formatDate(r.submittedAt)}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">総所要時間</span>
+        <span class="detail-value">${Math.round(r.totalTimeMs / 1000)}秒</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">1問あたり平均</span>
+        <span class="detail-value">${avgTime}秒</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">ALL ANSWERS</div>
+      ${QUESTIONS.map((q) => {
+        const ans = r.answers[q.id];
+        if (!ans) return '';
+        const t = (ans.timeMs / 1000).toFixed(1);
+        const speed = ans.timeMs < 3000 ? 'fast' : ans.timeMs > 10000 ? 'slow' : '';
+        const speedLabel = ans.timeMs < 3000 ? '⚡即答' : ans.timeMs > 10000 ? '🤔長考' : '';
+        const isLie = q.category === 'lie-scale' && ans.value === 'yes';
+
+        if (q.type === 'episode' || q.type === 'text') {
+          const kwInfo = q.id === 'q_fun' ? r.scores.funKeywords : null;
+          return `
+            <div class="qa-item">
+              <div class="qa-q">${q.question}</div>
+              <div class="episode-text">${escape(ans.value)}</div>
+              <div class="qa-meta">
+                ${ans.value.length}文字 • ${t}秒 <span class="${speed}">${speedLabel}</span>
+              </div>
+              ${kwInfo && (kwInfo.positive.length || kwInfo.negative.length) ? `
+                <div style="margin-top:6px">
+                  ${kwInfo.positive.map((k) => `<span class="keyword-pill pos">+ ${k}</span>`).join('')}
+                  ${kwInfo.negative.map((k) => `<span class="keyword-pill neg">− ${k}</span>`).join('')}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+
+        const opt = q.options.find((o) => o.value === ans.value);
+        return `
+          <div class="qa-item">
+            <div class="qa-q">${q.question}</div>
+            <div class="qa-a">
+              ${ans.value}. ${escape(opt?.text || '')}
+              ${isLie ? '<span class="qa-tag lie">嘘の可能性</span>' : ''}
+            </div>
+            <div class="qa-meta">
+              ${t}秒 <span class="${speed}">${speedLabel}</span>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="action-row">
+      <button class="action-btn danger" onclick="deleteRecord('${r.id}')">この回答を削除</button>
+    </div>
+  `;
+
+  document.getElementById('modalBg').classList.add('active');
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('active');
+  document.getElementById('modal').classList.remove('active');
+}
+
+function deleteRecord(id) {
+  if (!confirm('この回答を削除しますか？')) return;
+  const list = getResponses().filter((r) => r.id !== id);
+  localStorage.setItem('aptitude_responses', JSON.stringify(list));
+  closeModal();
+  renderList();
+}
+
+function clearAll() {
+  if (!confirm('全データを削除しますか？')) return;
+  localStorage.removeItem('aptitude_responses');
+  renderList();
+}
+
+// デモ用ダミーデータ
+function seedDemo() {
+  const samples = [
+    {
+      name: '田中 さくら',
+      pattern: 'ideal', // 主体性◎協調性◎楽観性◎
+      fun: '友達と海に行ってめっちゃ楽しかった！夕日が最高で笑いっぱなしでした。',
+    },
+    {
+      name: '佐藤 みか',
+      pattern: 'liar', // 取り繕い高
+      fun: 'カフェに行って勉強しました。集中できて良かったです。',
+    },
+    {
+      name: '鈴木 あや',
+      pattern: 'detail', // 慎重型
+      fun: '友人と食事をしました。お店選びに時間をかけたので、満足のいくお店に行けて良かったです。料理の味も雰囲気も期待通りで、写真もたくさん撮りました。次はもっと予約を早めにしようと思います。',
+    },
+    {
+      name: '高橋 ゆい',
+      pattern: 'cooperative', // 協調性◎
+      fun: '友達の誕生日サプライズを企画して、みんなで成功させたとき！喜んでくれて嬉しかった。',
+    },
+  ];
+
+  for (const s of samples) {
+    const answers = generatePattern(s.pattern, s.fun);
+    answers['q_name'] = { value: s.name, timeMs: 4000 };
+    const scores = scoreResponse(answers);
+    const rec = getRecommendation(scores);
+
+    const submission = {
+      id: 'r_demo_' + Math.random().toString(36).slice(2, 9),
+      name: s.name,
+      submittedAt: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString(),
+      totalTimeMs: 180000 + Math.random() * 120000,
+      answers,
+      questionTimes: Object.fromEntries(Object.entries(answers).map(([k, v]) => [k, v.timeMs])),
+      scores,
+      recommendation: rec,
+    };
+    const list = getResponses();
+    list.push(submission);
+    localStorage.setItem('aptitude_responses', JSON.stringify(list));
+  }
+  renderList();
+}
+
+function generatePattern(pattern, fun, friendLabel = 'いつも明るい人') {
+  const answers = {};
+  // ideal: 主体性・協調性・楽観性をバランスよく選ぶための疑似乱数（質問IDベースで決定的）
+  let counter = 0;
+  for (const q of QUESTIONS) {
+    if (q.type === 'text') continue;
+    if (q.id === 'q_fun') {
+      answers[q.id] = { value: fun, timeMs: 30000 + Math.random() * 30000 };
+      continue;
+    }
+    if (q.id === 'q_friend') {
+      answers[q.id] = { value: friendLabel, timeMs: 12000 };
+      continue;
+    }
+
+    let chosen;
+    if (q.type === 'forced-choice') {
+      if (pattern === 'ideal') {
+        if (q.category === 'lie-scale') {
+          chosen = q.options.find((o) => o.value === 'no');
+        } else {
+          // 良い特性を持つ選択肢の中で、ローテーションでバランス良く選ぶ
+          const targets = ['optimism', 'initiative', 'cooperation'];
+          const good = q.options.filter((o) => targets.some((t) => o.traits[t]));
+          if (good.length === 0) chosen = q.options[0];
+          else if (good.length === 1) chosen = good[0];
+          else { chosen = good[counter % good.length]; counter++; }
+        }
+      } else if (pattern === 'liar') {
+        if (q.category === 'lie-scale') chosen = q.options.find((o) => o.value === 'yes');
+        else chosen = q.options.find((o) => o.traits.cooperation) || q.options[0];
+      } else if (pattern === 'detail') {
+        chosen = q.options.find((o) => o.traits.detail) || q.options[0];
+        if (q.category === 'lie-scale') chosen = q.options.find((o) => o.value === 'no');
+      } else if (pattern === 'cooperative') {
+        chosen = q.options.find((o) => o.traits.cooperation) || q.options.find((o) => o.traits.optimism) || q.options[0];
+        if (q.category === 'lie-scale') chosen = q.options.find((o) => o.value === 'no');
+      }
+      if (!chosen) chosen = q.options[0];
+      const baseTime = pattern === 'ideal' ? 2000 : pattern === 'detail' ? 8000 : 4000;
+      answers[q.id] = { value: chosen.value, timeMs: baseTime + Math.random() * 4000 };
+    }
+  }
+  return answers;
+}
+
+renderList();
+</script>
+
+</body>
+</html>
