@@ -177,6 +177,62 @@ body{
   margin-top:10px;line-height:1.7;
 }
 
+/* タイプ診断カード */
+.type-card{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--ink),#2a2a2a);
+  color:#fff;border-radius:16px;padding:22px 20px 20px;
+  margin-bottom:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+}
+.type-card::before{
+  content:'';position:absolute;inset:0 0 auto 0;height:4px;
+  background:var(--fit-color,var(--accent));
+}
+.type-card .type-tagline{
+  font-size:11px;letter-spacing:.2em;
+  color:var(--fit-color,var(--accent));
+  font-weight:700;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.type-card .type-row{
+  display:flex;align-items:center;gap:18px;
+}
+.type-card .type-icon{
+  font-size:64px;line-height:1;flex-shrink:0;
+  filter:drop-shadow(0 2px 8px rgba(255,255,255,.2));
+}
+.type-card .type-meta{flex:1;min-width:0}
+.type-card .type-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:30px;font-weight:600;letter-spacing:.04em;
+  line-height:1.1;margin-bottom:6px;
+}
+.type-card .type-jp{
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:15px;font-weight:700;
+  color:rgba(255,255,255,.85);
+}
+.type-card .type-stars{
+  font-size:14px;letter-spacing:.15em;
+  color:var(--fit-color,var(--accent));
+  margin-top:6px;
+}
+.type-card .type-desc{
+  font-size:13px;line-height:1.85;
+  color:rgba(255,255,255,.78);
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.type-card .fit-badge{
+  display:inline-block;margin-top:12px;
+  padding:4px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;letter-spacing:.1em;
+  background:var(--fit-color,var(--accent));
+  color:#fff;
+}
+
 .warn-box{
   background:#fff4e8;border:1px solid var(--warn);
   border-radius:10px;padding:12px 14px;font-size:13px;
@@ -421,12 +477,23 @@ function openDetail(id) {
   const times = Object.values(r.questionTimes || {}).filter((t) => t > 0);
   const avgTime = times.length ? Math.round(times.reduce((a, b) => a + b, 0) / times.length / 1000 * 10) / 10 : 0;
 
+  const t = r.recommendation.type || diagnoseType(r.scores);
+  const fitColor = (typeof FIT_COLORS !== 'undefined' && FIT_COLORS[t.fit]) || '#ff5b3a';
+  const fitLabel = { best: 'BEST FIT', good: 'GOOD FIT', ok: 'OK FIT', bad: 'NOT FIT', caution: 'CAUTION' }[t.fit] || 'FIT';
+
   body.innerHTML = `
-    <div class="summary-box">
-      <div style="font-size:11px;letter-spacing:.2em;opacity:.6">RECOMMENDATION</div>
-      <div class="rank-display">${r.recommendation.rank}</div>
-      <div class="stars">${'★'.repeat(r.recommendation.stars)}${'☆'.repeat(5 - r.recommendation.stars)}</div>
-      <div class="reason">${r.recommendation.reason}</div>
+    <div class="type-card" style="--fit-color:${fitColor}">
+      <div class="type-tagline">${escape(t.tagline)}</div>
+      <div class="type-row">
+        <div class="type-icon">${t.icon}</div>
+        <div class="type-meta">
+          <div class="type-name">${escape(t.type)}</div>
+          <div class="type-jp">${escape(t.name)}</div>
+          <div class="type-stars">${'★'.repeat(t.stars)}${'☆'.repeat(5 - t.stars)}</div>
+        </div>
+      </div>
+      <div class="type-desc">${escape(t.desc)}</div>
+      <span class="fit-badge">${fitLabel}</span>
     </div>
 
     <div class="section">
