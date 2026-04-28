@@ -49,22 +49,6 @@ const QUESTIONS = [
     ],
   },
   {
-    id: 'q3', type: 'forced-choice', category: 'initiative',
-    question: 'グループでの議論、私は',
-    options: [
-      { value: 'A', text: '自分の意見を最初に出す', traits: { initiative: 2, communication: 1 } },
-      { value: 'B', text: 'みんなの意見を聞いてから話す', traits: { cooperation: 2, detail: 1 } },
-    ],
-  },
-  {
-    id: 'q4', type: 'forced-choice', category: 'initiative',
-    question: '飲み会の幹事を頼まれた、私は',
-    options: [
-      { value: 'A', text: '喜んで引き受けて段取りする', traits: { initiative: 2, communication: 1 } },
-      { value: 'B', text: '他に適任がいれば譲る', traits: { cooperation: 1, detail: 1 } },
-    ],
-  },
-  {
     id: 'q5', type: 'forced-choice', category: 'initiative',
     question: '新しいスキルを学ぶとき、私は',
     options: [
@@ -99,14 +83,6 @@ const QUESTIONS = [
     ],
   },
   {
-    id: 'q9', type: 'forced-choice', category: 'cooperation',
-    question: '友達の悩みを聞いた後、私は',
-    options: [
-      { value: 'A', text: '自分の経験談を話す', traits: { initiative: 1, communication: 2 } },
-      { value: 'B', text: '相手の話の続きを聞く', traits: { cooperation: 2 } },
-    ],
-  },
-  {
     id: 'q10', type: 'forced-choice', category: 'cooperation',
     question: 'グループLINEで盛り上がっているとき、私は',
     options: [
@@ -128,14 +104,6 @@ const QUESTIONS = [
     options: [
       { value: 'A', text: '自分の主張を伝える', traits: { initiative: 2, communication: 1 } },
       { value: 'B', text: '相手の意見も取り入れる', traits: { cooperation: 2, flexibility: 2 } },
-    ],
-  },
-  {
-    id: 'q13', type: 'forced-choice', category: 'cooperation',
-    question: '飲み会で隣に座った知らない人、私は',
-    options: [
-      { value: 'A', text: '自分から話しかける', traits: { initiative: 2, communication: 2 } },
-      { value: 'B', text: '話しかけられたら返す', traits: { cooperation: 1, detail: 1 } },
     ],
   },
   {
@@ -173,27 +141,11 @@ const QUESTIONS = [
     ],
   },
   {
-    id: 'q18', type: 'forced-choice', category: 'optimism',
-    question: '服を買うとき、私は',
-    options: [
-      { value: 'A', text: '直感で「これ！」と決める', traits: { optimism: 2, initiative: 1 } },
-      { value: 'B', text: 'じっくり試着して比較する', traits: { detail: 2 } },
-    ],
-  },
-  {
     id: 'q19', type: 'forced-choice', category: 'optimism',
     question: '雨の日に予定があったら、私は',
     options: [
       { value: 'A', text: '「なんとかなる」と出かける', traits: { optimism: 2, resilience: 1 } },
       { value: 'B', text: '室内に予定変更する', traits: { detail: 1, flexibility: 1 } },
-    ],
-  },
-  {
-    id: 'q20', type: 'forced-choice', category: 'optimism',
-    question: '初めての店に入るとき、私は',
-    options: [
-      { value: 'A', text: 'とりあえず入って雰囲気で決める', traits: { optimism: 2, initiative: 1 } },
-      { value: 'B', text: '事前に口コミを調べてから行く', traits: { detail: 2 } },
     ],
   },
   {
@@ -231,24 +183,8 @@ const QUESTIONS = [
       { value: 'no', text: 'いいえ', traits: {} },
     ],
   },
-  {
-    id: 'q_lie4', type: 'forced-choice', category: 'lie-scale',
-    question: '誰の悪口も今まで一度も言ったことがない',
-    options: [
-      { value: 'yes', text: 'はい', traits: { lie: 2 } },
-      { value: 'no', text: 'いいえ', traits: {} },
-    ],
-  },
-  {
-    id: 'q_lie5', type: 'forced-choice', category: 'lie-scale',
-    question: 'やりたくない仕事も全部楽しんでやれる',
-    options: [
-      { value: 'yes', text: 'はい', traits: { lie: 1 } },
-      { value: 'no', text: 'いいえ', traits: {} },
-    ],
-  },
 
-  // ========== ⑤ SJT 状況判断テスト (5問) ==========
+  // ========== ⑤ SJT 状況判断テスト (3問) ==========
   // 仕事文脈の判断力を測る。明確な正解がないが、選択で価値観が見える
   {
     id: 'q_sjt1', type: 'forced-choice', category: 'sjt',
@@ -258,16 +194,6 @@ const QUESTIONS = [
       { value: 'B', text: '自分の仕事を終わらせてから声をかける', traits: { detail: 2 } },
       { value: 'C', text: '本人が気づくまで見守る', traits: { cooperation: 1 } },
       { value: 'D', text: '上司に報告する', traits: { detail: 1 } },
-    ],
-  },
-  {
-    id: 'q_sjt2', type: 'forced-choice', category: 'sjt',
-    question: 'やる気はあるけどミスが多い後輩、あなたは',
-    options: [
-      { value: 'A', text: 'やる気を褒めながらミスを指摘', traits: { communication: 2, cooperation: 2, optimism: 1 } },
-      { value: 'B', text: '厳しくミスを指摘', traits: { initiative: 1, detail: 1 } },
-      { value: 'C', text: '自分でフォローしておく', traits: { cooperation: 1, detail: 1 } },
-      { value: 'D', text: '上司に相談する', traits: { detail: 2 } },
     ],
   },
   {
@@ -290,18 +216,8 @@ const QUESTIONS = [
       { value: 'D', text: '「自分のせいじゃない」と言う', traits: { lie: 2 } }, // NG選択肢
     ],
   },
-  {
-    id: 'q_sjt5', type: 'forced-choice', category: 'sjt',
-    question: '同僚が休んだ。急にシフト追加できる？と頼まれた。',
-    options: [
-      { value: 'A', text: '予定を調整して引き受ける', traits: { cooperation: 2, initiative: 2, optimism: 1 } },
-      { value: 'B', text: '他に頼める人いないか聞く', traits: { detail: 1, cooperation: 1 } },
-      { value: 'C', text: '自分の予定を優先して断る', traits: { detail: 1 } },
-      { value: 'D', text: '「絶対無理」と即断', traits: { lie: 1 } }, // 協調性低
-    ],
-  },
 
-  // ========== ⑥ 思考実験 (3問) ==========
+  // ========== ⑥ 思考実験 (2問) ==========
   {
     id: 'q_island', type: 'forced-choice', category: 'thought-experiment',
     question: '無人島に1つだけ持っていくなら？',
@@ -322,36 +238,8 @@ const QUESTIONS = [
       { value: 'D', text: '全額貯金する', traits: { detail: 2 } },
     ],
   },
-  {
-    id: 'q_time', type: 'forced-choice', category: 'thought-experiment',
-    question: '1日が30時間に伸びたら、6時間何に使う？',
-    options: [
-      { value: 'A', text: '趣味・遊びに使う', traits: { optimism: 2 } },
-      { value: 'B', text: '仕事や勉強で稼ぐ', traits: { initiative: 2, detail: 1 } },
-      { value: 'C', text: 'ゆっくり寝る', traits: { resilience: 1 } },
-      { value: 'D', text: '友達・家族と過ごす', traits: { cooperation: 2, communication: 1 } },
-    ],
-  },
 
-  // ========== ⑦ 自由記述 (3問) ==========
-  {
-    id: 'q_friend', type: 'episode', category: 'self-image',
-    question: '友達はあなたを一言で表すと、どんな人だと言いますか？',
-    placeholder: '例：いつも笑ってる人',
-    maxLength: 100,
-  },
-  {
-    id: 'q_fun', type: 'episode', category: 'optimism',
-    question: '直近1週間で、一番楽しかった瞬間を教えてください',
-    placeholder: 'どんな場面で何があったか、200字以内で',
-    maxLength: 200,
-  },
-  {
-    id: 'q_difficult', type: 'episode', category: 'cooperation',
-    question: '苦手なタイプの人と仕事することになったら、どう乗り切りますか？',
-    placeholder: '具体的にどう接するか、200字以内で',
-    maxLength: 200,
-  },
+  // ========== ⑦ 自由記述 (1問・最終) ==========
   {
     id: 'q_effort', type: 'episode', category: 'grit',
     question: '今までの人生で一番努力したこと・頑張ったことは何ですか？',
@@ -391,29 +279,7 @@ function scoreResponse(answers) {
     }
   }
 
-  // 楽しかった瞬間のキーワード分析（楽観性に加点/減点）
-  const funAnswer = (answers['q_fun']?.value) || '';
-  const positiveKeywords = ['楽しい', '楽しかった', '嬉しい', '最高', '良かった', 'よかった', 'わくわく', '笑', '幸せ', '面白', 'ハマ', '感動', '嬉し', 'ニコニコ', 'うれし', 'ハッピー'];
-  const negativeKeywords = ['不安', '心配', '辛い', 'しんどい', '疲れた', 'だるい', '面倒', '無理', 'モヤモヤ', '気まずい'];
-  const funPositive = positiveKeywords.filter((kw) => funAnswer.includes(kw));
-  const funNegative = negativeKeywords.filter((kw) => funAnswer.includes(kw));
-  const funBonus = funPositive.length - funNegative.length;
-  if (funAnswer.length > 0 && funAnswer.length <= 80) scores.optimism += 1; // 短文=大雑把=楽観
-  if (funAnswer.length > 150) scores.optimism -= 1; // 長文=細かい
-  scores.optimism += funBonus * 1.5;
-  maxScores.optimism += 6;
-
-  // 苦手な人への対処戦略のキーワード分析
-  const difficultAnswer = (answers['q_difficult']?.value) || '';
-  const cooperativeKeywords = ['理解', '聞く', '寄り添', '相談', '話す', '接する', '尊重', '受け入れ', '合わせ', '共通点', 'ありがとう'];
-  const avoidanceKeywords = ['避け', '距離', '関わらな', '無視', '我慢', '耐え', '近づか'];
-  const diffPositive = cooperativeKeywords.filter((kw) => difficultAnswer.includes(kw));
-  const diffNegative = avoidanceKeywords.filter((kw) => difficultAnswer.includes(kw));
-  scores.cooperation += diffPositive.length * 1.5;
-  scores.cooperation -= diffNegative.length * 2;
-  maxScores.cooperation += 4;
-
-  // 反応速度ボーナス: 強制選択で平均が早い人=直感型=楽観性傾向
+  // 反応速度: 強制選択で平均が早い人=直感型=楽観性傾向
   const fcTimes = QUESTIONS
     .filter((q) => q.type === 'forced-choice' && q.category !== 'lie-scale')
     .map((q) => answers[q.id]?.timeMs)
@@ -436,8 +302,6 @@ function scoreResponse(answers) {
     raw: scores,
     max: maxScores,
     avgTimeMs: Math.round(avgTime),
-    funKeywords: { positive: funPositive, negative: funNegative },
-    diffKeywords: { positive: diffPositive, negative: diffNegative },
   };
 }
 
