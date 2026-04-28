@@ -356,6 +356,60 @@ function escape(s) {
   return String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+// 6軸レーダーチャート(SVG)
+function radarChart(scores) {
+  const axes = [
+    { key: 'initiative',    label: '主体性' },
+    { key: 'cooperation',   label: '協調性' },
+    { key: 'optimism',      label: '楽観性' },
+    { key: 'communication', label: 'コミュ力' },
+    { key: 'flexibility',   label: '柔軟性' },
+    { key: 'resilience',    label: 'ストレス耐性' },
+  ];
+  const size = 320;
+  const cx = size / 2, cy = size / 2;
+  const maxR = 100;
+  const labelR = maxR + 32;
+  const angle = (i) => (Math.PI * 2 * i) / axes.length - Math.PI / 2;
+  const point = (i, r) => [cx + Math.cos(angle(i)) * r, cy + Math.sin(angle(i)) * r];
+
+  const grid = [0.25, 0.5, 0.75, 1.0].map((lv) => {
+    const pts = axes.map((_, i) => point(i, maxR * lv).join(',')).join(' ');
+    return `<polygon points="${pts}" fill="${lv === 1 ? 'rgba(0,0,0,0.02)' : 'none'}" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>`;
+  }).join('');
+
+  const axisLines = axes.map((_, i) => {
+    const [x, y] = point(i, maxR);
+    return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>`;
+  }).join('');
+
+  const scorePts = axes.map((a, i) => point(i, ((scores[a.key] || 0) / 100) * maxR).join(',')).join(' ');
+
+  const scoreDots = axes.map((a, i) => {
+    const [x, y] = point(i, ((scores[a.key] || 0) / 100) * maxR);
+    return `<circle cx="${x}" cy="${y}" r="3.5" fill="#ff5b3a"/>`;
+  }).join('');
+
+  const labels = axes.map((a, i) => {
+    const [x, y] = point(i, labelR);
+    const v = scores[a.key] || 0;
+    return `
+      <text x="${x}" y="${y - 4}" text-anchor="middle" font-size="11" font-weight="500" fill="#5a5a5a" font-family="'Noto Sans JP',sans-serif">${a.label}</text>
+      <text x="${x}" y="${y + 12}" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a1a" font-family="'Noto Sans JP',sans-serif">${v}</text>
+    `;
+  }).join('');
+
+  return `
+    <svg viewBox="0 0 ${size} ${size}" width="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="display:block;max-width:340px;margin:0 auto">
+      ${grid}
+      ${axisLines}
+      <polygon points="${scorePts}" fill="rgba(255,91,58,0.18)" stroke="#ff5b3a" stroke-width="2" stroke-linejoin="round"/>
+      ${scoreDots}
+      ${labels}
+    </svg>
+  `;
+}
+
 function openDetail(id) {
   const r = getResponses().find((x) => x.id === id);
   if (!r) return;
@@ -373,6 +427,11 @@ function openDetail(id) {
       <div class="rank-display">${r.recommendation.rank}</div>
       <div class="stars">${'★'.repeat(r.recommendation.stars)}${'☆'.repeat(5 - r.recommendation.stars)}</div>
       <div class="reason">${r.recommendation.reason}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">PERSONALITY RADAR</div>
+      ${radarChart(r.scores)}
     </div>
 
     <div class="section">
