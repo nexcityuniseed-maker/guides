@@ -602,50 +602,42 @@ function seedDemo() {
       prefs: { initiative: 1.5, optimism: 1.5, cooperation: 1.7, communication: 0.5, flexibility: 1.5, resilience: 1.0 }, // → 太陽
       lieRate: 0,
       timeBase: 2000,
-      effort: '高校のときバスケ部で副キャプテンやってて、3年間毎朝6時から朝練続けたこと！最初は本当しんどかったけど、仲間と励まし合って続けてたら最後の大会で県ベスト4まで行けた。あの3年があるから、何でも続ければ結果出るって信じられるようになった。今もこれが自分の自信になってる。',
     },
     {
       name: '高橋 ゆい',
       prefs: { cooperation: 1.4, optimism: 1.0, communication: 1.2 }, // → 桜
       lieRate: 0,
       timeBase: 3500,
-      effort: '美容学校に通いながら週5でカフェのバイトを2年続けたことです。学費を自分で払いたくて始めたんですが、課題と両立するのが本当に大変で何度も心折れそうになりました。でも同じ目標で頑張ってる友達の存在に支えられて、卒業のとき皆勤賞もらえました。人に支えられた分、今度は自分も誰かを支えたいなと思っています。',
     },
     {
       name: '渡辺 れい',
       prefs: { initiative: 1.5, optimism: 1.2, cooperation: -0.5 }, // → 流星
       lieRate: 0,
       timeBase: 1800,
-      effort: '高校時代に独学でネイル始めて、2年で1級取ったこと。最初は学校の友達にやって練習してて、SNSで発信してたら個人で予約くれる人が増えた。誰にも教わらずに調べて試して失敗して、を繰り返した。1人で完結させる癖がついたのはこの時期。技術は裏切らないって学んだ。',
     },
     {
       name: '鈴木 あや',
       prefs: { detail: 3.0, resilience: 3.5, initiative: -1.5, cooperation: -2.0, optimism: 0.5 }, // → 岩
       lieRate: 0.1,
       timeBase: 8500,
-      effort: '大学受験の勉強です。1年浪人しまして、毎日12時間以上、計画表を作って科目ごとに時間配分を決めて取り組みました。模試の結果は週ごとに記録し、苦手分野は問題集を3周以上解き直しました。結果的に第一志望には届きませんでしたが、計画通りに継続することの大切さを学びました。今でも何かに取り組むときは必ず計画から立てるようにしています。',
     },
     {
       name: '佐藤 みか',
       prefs: { cooperation: 1.0, optimism: 0.8 }, // → 桜寄り、ただしlie大量
       lieRate: 1.0, // 全部はい → 霧
       timeBase: 5000,
-      effort: '今までの人生でずっと努力してきました。小学校から大学までずっと真面目に頑張ってきましたし、今もどんなことにも全力で取り組んでいます。人より努力していると自負しています。',
     },
     {
       name: '中村 みお',
       prefs: { optimism: -1.0, resilience: -1.0, detail: 0.8 }, // → 雨
       lieRate: 0.1,
       timeBase: 11000,
-      effort: 'うーん…特にこれといって思いつかないです。普通に学校に通って、バイトもそれなりにやってきたくらいで、誇れるようなことはあまりないかも。',
     },
   ];
 
   const list = getResponses();
   for (const s of samples) {
-    const answers = generatePattern(s.prefs, s.lieRate, s.timeBase, {
-      q_effort: s.effort,
-    });
+    const answers = generatePattern(s.prefs, s.lieRate, s.timeBase);
     answers['q_name'] = { value: s.name, timeMs: 4000 };
     const scores = scoreResponse(answers);
     const rec = getRecommendation(scores);
