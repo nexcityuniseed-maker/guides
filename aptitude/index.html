@@ -201,7 +201,10 @@ body{
 <!-- Screens are dynamically rendered here -->
 <div id="screens"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script src="questions.js"></script>
+<script src="storage.js"></script>
 <script>
 const state = {
   current: 0,
@@ -335,7 +338,7 @@ function render() {
     const scores = scoreResponse(state.answers);
     const rec = getRecommendation(scores);
 
-    // Save to localStorage
+    // 保存 (Supabaseまたはlocalstorage、Storage側で自動切替)
     const submission = {
       id: 'r_' + Date.now(),
       name: state.answers['q_name']?.value || '名無し',
@@ -346,9 +349,10 @@ function render() {
       scores,
       recommendation: rec,
     };
-    const list = JSON.parse(localStorage.getItem('aptitude_responses') || '[]');
-    list.push(submission);
-    localStorage.setItem('aptitude_responses', JSON.stringify(list));
+    Storage.save(submission).catch((err) => {
+      console.error('保存に失敗:', err);
+      alert('送信に失敗しました。電波の良い場所で再度お試しください。');
+    });
 
     newScreen.innerHTML = `
       <div class="inner">
@@ -405,6 +409,7 @@ function next() {
   render();
 }
 
+Storage.init();
 render();
 </script>
 

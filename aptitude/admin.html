@@ -283,11 +283,95 @@ body{
   font-weight:500;
 }
 .demo-bar button:hover{background:rgba(255,255,255,.2)}
+
+/* ログイン画面 */
+.login-overlay{
+  position:fixed;inset:0;z-index:300;
+  background:var(--bg);
+  display:none;
+  align-items:center;justify-content:center;
+  padding:24px;
+}
+.login-overlay.active{display:flex}
+.login-card{
+  width:100%;max-width:380px;
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:32px 28px 28px;
+  box-shadow:0 12px 36px rgba(0,0,0,.06);
+}
+.login-card .brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:600;letter-spacing:.06em;
+}
+.login-card .sub{
+  font-size:11px;letter-spacing:.2em;color:var(--ink-soft);
+  margin-top:2px;margin-bottom:24px;
+}
+.login-card h2{
+  font-size:18px;font-weight:700;margin-bottom:6px;
+}
+.login-card p{font-size:13px;color:var(--ink-soft);margin-bottom:18px;line-height:1.7}
+.login-card label{
+  display:block;font-size:11px;font-weight:700;
+  letter-spacing:.1em;color:var(--ink-soft);
+  margin-bottom:6px;margin-top:14px;
+}
+.login-card input{
+  width:100%;padding:12px 14px;
+  border:1.5px solid var(--line);border-radius:10px;
+  font-size:15px;font-family:inherit;
+  transition:border-color .15s;
+  -webkit-appearance:none;
+}
+.login-card input:focus{outline:none;border-color:var(--ink)}
+.login-card .login-btn{
+  width:100%;margin-top:20px;
+  background:var(--ink);color:#fff;border:none;
+  padding:13px;border-radius:999px;
+  font-weight:700;font-size:14px;letter-spacing:.05em;
+  cursor:pointer;font-family:inherit;
+}
+.login-card .login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-card .login-err{
+  font-size:12px;color:var(--bad);margin-top:10px;line-height:1.6;
+  display:none;
+}
+.login-card .login-err.show{display:block}
+
+/* ログアウトボタン (ヘッダー右上) */
+.logout-btn{
+  position:absolute;top:18px;right:18px;
+  background:rgba(255,255,255,.08);color:#fff;
+  border:1px solid rgba(255,255,255,.15);
+  padding:6px 12px;border-radius:999px;
+  font-size:11px;font-family:inherit;cursor:pointer;
+  font-weight:500;letter-spacing:.05em;
+}
+.logout-btn:hover{background:rgba(255,255,255,.15)}
 </style>
 </head>
 <body>
 
+<!-- ログイン画面 (Supabaseモード時のみ表示) -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="brand">eye mor</div>
+    <div class="sub">ADMIN LOGIN</div>
+    <h2>管理画面へログイン</h2>
+    <p>Supabaseに登録した管理者アカウントでログインしてください。</p>
+    <label>メールアドレス</label>
+    <input type="email" id="loginEmail" autocomplete="email" placeholder="admin@example.com">
+    <label>パスワード</label>
+    <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••">
+    <button class="login-btn" id="loginBtn" onclick="handleLogin()">ログイン</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
 <header class="header">
+  <button class="logout-btn" id="logoutBtn" onclick="handleLogout()" style="display:none">ログアウト</button>
   <div class="brand">eye mor</div>
   <div class="sub">ADMIN DASHBOARD</div>
   <h1>適性検査 受験者一覧</h1>
@@ -328,10 +412,26 @@ body{
   <button onclick="window.location.href='index.html'">フォーム→</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script src="questions.js"></script>
+<script src="storage.js"></script>
 <script>
+// 直近のリストをキャッシュ (詳細表示・削除時に再取得不要にするため)
+let currentList = [];
+
+async function refreshList() {
+  try {
+    currentList = await Storage.list();
+  } catch (e) {
+    console.error('一覧取得失敗:', e);
+    alert('一覧の取得に失敗しました: ' + (e.message || e));
+    currentList = [];
+  }
+}
+
 function getResponses() {
-  return JSON.parse(localStorage.getItem('aptitude_responses') || '[]');
+  return currentList;
 }
 
 function formatDate(iso) {
@@ -341,6 +441,11 @@ function formatDate(iso) {
   const h = d.getHours().toString().padStart(2, '0');
   const min = d.getMinutes().toString().padStart(2, '0');
   return `${m}/${day} ${h}:${min}`;
+}
+
+async function refreshAndRender() {
+  await refreshList();
+  renderList();
 }
 
 function renderList() {
@@ -580,22 +685,30 @@ function closeModal() {
   document.getElementById('modal').classList.remove('active');
 }
 
-function deleteRecord(id) {
+async function deleteRecord(id) {
   if (!confirm('この回答を削除しますか？')) return;
-  const list = getResponses().filter((r) => r.id !== id);
-  localStorage.setItem('aptitude_responses', JSON.stringify(list));
+  try {
+    await Storage.delete(id);
+  } catch (e) {
+    alert('削除に失敗しました: ' + (e.message || e));
+    return;
+  }
   closeModal();
-  renderList();
+  await refreshAndRender();
 }
 
-function clearAll() {
+async function clearAll() {
+  if (Storage.isCloud) {
+    alert('クラウドモードでは一括削除できません。Supabaseダッシュボードから削除してください。');
+    return;
+  }
   if (!confirm('全データを削除しますか？')) return;
-  localStorage.removeItem('aptitude_responses');
-  renderList();
+  await Storage.clearLocal();
+  await refreshAndRender();
 }
 
 // デモ用ダミーデータ ── 主要タイプを網羅
-function seedDemo() {
+async function seedDemo() {
   const samples = [
     {
       name: '田中 さくら',
@@ -635,13 +748,12 @@ function seedDemo() {
     },
   ];
 
-  const list = getResponses();
   for (const s of samples) {
     const answers = generatePattern(s.prefs, s.lieRate, s.timeBase);
     answers['q_name'] = { value: s.name, timeMs: 4000 };
     const scores = scoreResponse(answers);
     const rec = getRecommendation(scores);
-    list.push({
+    const submission = {
       id: 'r_demo_' + Math.random().toString(36).slice(2, 9),
       name: s.name,
       submittedAt: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString(),
@@ -650,10 +762,14 @@ function seedDemo() {
       questionTimes: Object.fromEntries(Object.entries(answers).map(([k, v]) => [k, v.timeMs])),
       scores,
       recommendation: rec,
-    });
+    };
+    try {
+      await Storage.save(submission);
+    } catch (e) {
+      console.error('seed save failed', e);
+    }
   }
-  localStorage.setItem('aptitude_responses', JSON.stringify(list));
-  renderList();
+  await refreshAndRender();
 }
 
 // preferences(prefs)を最大化する選択肢を選ぶ
@@ -690,7 +806,82 @@ function generatePattern(prefs, lieRate, timeBaseMs, episodes) {
   return answers;
 }
 
-renderList();
+// ========== 認証 + 初期化 ==========
+function showLogin() {
+  document.getElementById('loginOverlay').classList.add('active');
+  document.getElementById('logoutBtn').style.display = 'none';
+}
+function hideLogin() {
+  document.getElementById('loginOverlay').classList.remove('active');
+  document.getElementById('logoutBtn').style.display = Storage.isCloud ? 'block' : 'none';
+}
+
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginErr');
+  const btn = document.getElementById('loginBtn');
+  errEl.classList.remove('show');
+  if (!email || !password) {
+    errEl.textContent = 'メールアドレスとパスワードを入力してください。';
+    errEl.classList.add('show');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'ログイン中...';
+  try {
+    await Auth.signIn(email, password);
+    hideLogin();
+    await refreshAndRender();
+  } catch (e) {
+    errEl.textContent = 'ログインに失敗しました: ' + (e.message || 'メールまたはパスワードが違います');
+    errEl.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'ログイン';
+  }
+}
+
+async function handleLogout() {
+  if (!confirm('ログアウトしますか？')) return;
+  await Auth.signOut();
+  currentList = [];
+  showLogin();
+}
+
+async function init() {
+  Storage.init();
+  if (Storage.isCloud) {
+    const session = await Auth.getSession();
+    if (session) {
+      hideLogin();
+      await refreshAndRender();
+    } else {
+      showLogin();
+    }
+    Auth.onChange(async (sess) => {
+      if (sess) {
+        hideLogin();
+        await refreshAndRender();
+      } else {
+        showLogin();
+      }
+    });
+  } else {
+    // localStorageモード: 認証なしで即表示
+    hideLogin();
+    await refreshAndRender();
+  }
+}
+
+// Enterキーでログイン送信
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.getElementById('loginOverlay').classList.contains('active')) {
+    handleLogin();
+  }
+});
+
+init();
 </script>
 
 </body>
