@@ -354,21 +354,7 @@ function render() {
       <div class="inner">
         <div class="check">✓</div>
         <h2>ありがとうございました</h2>
-        <p>あなたの回答を受け付けました。<br>結果はサロン側で確認します。</p>
-        <div class="scores">
-          <div class="q-num" style="margin-bottom:14px">YOUR PROFILE (参考表示)</div>
-          ${[
-            { key: 'initiative', label: '主体性' },
-            { key: 'cooperation', label: '協調性' },
-            { key: 'optimism', label: '楽観性' },
-          ].map((c) => `
-            <div class="score-row">
-              <div class="score-label">${c.label}</div>
-              <div class="score-bar"><div class="score-fill" style="width:${scores[c.key]}%"></div></div>
-              <div class="score-num">${scores[c.key]}</div>
-            </div>
-          `).join('')}
-        </div>
+        <p>ご回答ありがとうございました。<br>結果はサロン側で確認させていただきます。<br>後日、改めてご連絡いたします。</p>
       </div>
     `;
   }
