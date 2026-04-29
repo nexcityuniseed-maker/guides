@@ -53,7 +53,7 @@ body{
   transition:opacity .45s cubic-bezier(.65,0,.35,1), transform .45s cubic-bezier(.65,0,.35,1);
 }
 .screen.active{opacity:1;pointer-events:auto;transform:translateY(0)}
-.screen.exit{opacity:0;transform:translateY(-20px)}
+.screen.exit{opacity:0;transform:translateY(-20px);pointer-events:none}
 
 .inner{width:100%;max-width:560px}
 
@@ -373,12 +373,19 @@ function render() {
     `;
   }
 
+  // 古い画面の遷移開始（active外す＋exit付与でフェードアウト）
+  if (oldScreen) {
+    oldScreen.classList.remove('active');
+    oldScreen.classList.add('exit');
+    setTimeout(() => oldScreen.remove(), 450);
+  }
+
   screensEl.appendChild(newScreen);
-  // Trigger animation
+  // 新画面のフェードイン（double rAFで初期スタイルを確実に適用してから.activeへ）
   requestAnimationFrame(() => {
-    if (oldScreen) oldScreen.classList.add('exit');
-    setTimeout(() => oldScreen?.remove(), 450);
-    newScreen.classList.add('active');
+    requestAnimationFrame(() => {
+      newScreen.classList.add('active');
+    });
   });
 
   state.questionStartTime = Date.now();
