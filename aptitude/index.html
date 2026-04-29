@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>eye mor 適性検査</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f1ea;
+  --ink:#1a1a1a;
+  --ink-soft:#5a5a5a;
+  --paper:#ffffff;
+  --accent:#ff5b3a;
+  --gold:#b8923f;
+  --line:rgba(0,0,0,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"palt";
+  user-select:none;
+}
+
+/* プログレスバー */
+.progress{
+  position:fixed;top:0;left:0;right:0;height:3px;
+  background:rgba(0,0,0,0.05);z-index:100;
+}
+.progress-bar{
+  height:100%;background:var(--accent);
+  width:0%;transition:width .4s cubic-bezier(.65,0,.35,1);
+}
+.progress-text{
+  position:fixed;top:14px;right:20px;
+  font-size:11px;font-weight:500;color:var(--ink-soft);
+  letter-spacing:.05em;z-index:100;
+}
+
+/* 画面 */
+.screen{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:60px 24px 40px;
+  opacity:0;pointer-events:none;
+  transform:translateY(20px);
+  transition:opacity .45s cubic-bezier(.65,0,.35,1), transform .45s cubic-bezier(.65,0,.35,1);
+}
+.screen.active{opacity:1;pointer-events:auto;transform:translateY(0)}
+.screen.exit{opacity:0;transform:translateY(-20px)}
+
+.inner{width:100%;max-width:560px}
+
+/* ウェルカム */
+.welcome .brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:42px;font-weight:600;letter-spacing:.08em;
+  margin-bottom:8px;
+}
+.welcome .sub{
+  font-size:13px;letter-spacing:.2em;color:var(--ink-soft);
+  margin-bottom:36px;font-weight:500;
+}
+.welcome h1{
+  font-size:28px;font-weight:700;line-height:1.5;
+  margin-bottom:20px;letter-spacing:.02em;
+}
+.welcome p{
+  font-size:15px;color:var(--ink-soft);
+  line-height:1.9;margin-bottom:14px;
+}
+.welcome .meta{
+  display:flex;gap:18px;margin:32px 0;
+  padding:16px 18px;background:var(--paper);
+  border-radius:12px;border:1px solid var(--line);
+}
+.welcome .meta-item{flex:1}
+.welcome .meta-label{font-size:11px;color:var(--ink-soft);letter-spacing:.1em;margin-bottom:4px}
+.welcome .meta-value{font-size:15px;font-weight:700}
+
+/* 質問 */
+.q-num{
+  font-size:11px;letter-spacing:.2em;color:var(--accent);
+  font-weight:700;margin-bottom:12px;
+}
+.q-text{
+  font-size:24px;font-weight:700;line-height:1.55;
+  margin-bottom:32px;letter-spacing:.01em;
+}
+@media(min-width:600px){.q-text{font-size:28px}}
+
+/* 選択肢 */
+.options{display:flex;flex-direction:column;gap:12px}
+.option{
+  background:var(--paper);
+  border:2px solid var(--line);
+  border-radius:14px;
+  padding:20px 22px;
+  font-size:16px;font-weight:500;line-height:1.5;
+  text-align:left;cursor:pointer;
+  transition:all .2s ease;
+  display:flex;align-items:center;gap:14px;
+  font-family:inherit;color:var(--ink);
+  width:100%;
+}
+.option:hover{border-color:var(--ink);transform:translateY(-1px)}
+.option:active{transform:scale(.98)}
+.option.selected{
+  border-color:var(--accent);
+  background:var(--accent);
+  color:#fff;
+}
+.option-key{
+  width:28px;height:28px;
+  border:1.5px solid currentColor;
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+  font-family:'Cormorant Garamond',serif;
+}
+
+/* テキスト入力 */
+.text-input,.textarea-input{
+  width:100%;
+  background:var(--paper);
+  border:2px solid var(--line);
+  border-radius:14px;
+  padding:18px 20px;
+  font-size:16px;
+  font-family:inherit;color:var(--ink);
+  transition:border-color .2s;
+  -webkit-appearance:none;
+}
+.text-input:focus,.textarea-input:focus{
+  outline:none;border-color:var(--ink);
+}
+.textarea-input{min-height:140px;resize:none;line-height:1.7}
+.char-count{
+  text-align:right;font-size:12px;color:var(--ink-soft);
+  margin-top:8px;
+}
+
+/* ボタン */
+.btn{
+  background:var(--ink);color:#fff;
+  border:none;border-radius:999px;
+  padding:14px 32px;font-size:15px;font-weight:700;
+  cursor:pointer;font-family:inherit;
+  transition:all .2s;letter-spacing:.05em;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn:hover{background:var(--accent);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn:disabled:hover{background:var(--ink)}
+.btn-row{margin-top:24px;display:flex;gap:12px;align-items:center}
+.btn-row .hint{font-size:12px;color:var(--ink-soft)}
+
+/* 完了画面 */
+.done .check{
+  font-size:64px;color:var(--accent);
+  margin-bottom:20px;
+}
+.done h2{font-size:32px;font-weight:700;margin-bottom:14px}
+.done p{font-size:15px;color:var(--ink-soft);line-height:1.9;margin-bottom:20px}
+.done .scores{
+  background:var(--paper);border-radius:14px;
+  padding:20px;border:1px solid var(--line);
+  margin-top:24px;
+}
+.done .score-row{
+  display:flex;align-items:center;gap:14px;
+  padding:8px 0;
+}
+.done .score-label{
+  width:80px;font-size:13px;font-weight:500;color:var(--ink-soft);
+}
+.done .score-bar{
+  flex:1;height:8px;background:rgba(0,0,0,.05);
+  border-radius:999px;overflow:hidden;
+}
+.done .score-fill{
+  height:100%;background:var(--accent);
+  border-radius:999px;transition:width 1s cubic-bezier(.65,0,.35,1);
+}
+.done .score-num{
+  width:36px;text-align:right;font-size:14px;font-weight:700;
+}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+<div class="progress-text" id="progressText"></div>
+
+<!-- Screens are dynamically rendered here -->
+<div id="screens"></div>
+
+<script src="questions.js"></script>
+<script>
+const state = {
+  current: 0,
+  answers: {},
+  startTime: Date.now(),
+  questionStartTime: Date.now(),
+  questionTimes: {},
+};
+
+// 表示順:welcome → 各質問 → done
+const flow = [
+  { type: 'welcome' },
+  ...QUESTIONS.map((q) => ({ type: 'question', q })),
+  { type: 'done' },
+];
+
+const screensEl = document.getElementById('screens');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+
+function updateProgress() {
+  const totalQ = QUESTIONS.length;
+  const currentQ = state.current === 0 ? 0 : Math.min(state.current, totalQ);
+  const pct = (currentQ / totalQ) * 100;
+  progressBar.style.width = pct + '%';
+  if (state.current > 0 && state.current <= totalQ) {
+    progressText.textContent = `${currentQ} / ${totalQ}`;
+  } else {
+    progressText.textContent = '';
+  }
+}
+
+function render() {
+  const item = flow[state.current];
+  const oldScreen = screensEl.querySelector('.screen.active');
+  const newScreen = document.createElement('div');
+  newScreen.className = 'screen';
+
+  if (item.type === 'welcome') {
+    newScreen.classList.add('welcome');
+    newScreen.innerHTML = `
+      <div class="inner">
+        <div class="brand">eye mor</div>
+        <div class="sub">APTITUDE TEST</div>
+        <h1>はじめまして。<br>あなたのことを教えてください。</h1>
+        <p>これは正解のない検査です。<br>直感で、素直に答えてください。</p>
+        <div class="meta">
+          <div class="meta-item">
+            <div class="meta-label">QUESTIONS</div>
+            <div class="meta-value">${QUESTIONS.length}問</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">TIME</div>
+            <div class="meta-value">約6分</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn" onclick="next()">はじめる →</button>
+        </div>
+      </div>
+    `;
+  } else if (item.type === 'question') {
+    const q = item.q;
+    const qNum = QUESTIONS.indexOf(q) + 1;
+    if (q.type === 'forced-choice') {
+      newScreen.innerHTML = `
+        <div class="inner">
+          <div class="q-num">QUESTION ${qNum} / ${QUESTIONS.length}</div>
+          <div class="q-text">${q.question}</div>
+          <div class="options">
+            ${q.options.map((opt) => `
+              <button class="option" data-value="${opt.value}" onclick="selectOption('${q.id}', '${opt.value}')">
+                <span class="option-key">${opt.value}</span>
+                <span>${opt.text}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    } else if (q.type === 'text') {
+      newScreen.innerHTML = `
+        <div class="inner">
+          <div class="q-num">QUESTION ${qNum} / ${QUESTIONS.length}</div>
+          <div class="q-text">${q.question}</div>
+          <input type="text" class="text-input" id="textInput" placeholder="${q.placeholder}" maxlength="${q.maxLength}">
+          <div class="btn-row">
+            <button class="btn" onclick="submitText('${q.id}')" id="textBtn" disabled>次へ →</button>
+          </div>
+        </div>
+      `;
+      setTimeout(() => {
+        const input = document.getElementById('textInput');
+        const btn = document.getElementById('textBtn');
+        input.addEventListener('input', () => {
+          btn.disabled = input.value.trim().length === 0;
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && input.value.trim()) {
+            e.preventDefault();
+            submitText(q.id);
+          }
+        });
+        input.focus();
+      }, 100);
+    } else if (q.type === 'episode') {
+      newScreen.innerHTML = `
+        <div class="inner">
+          <div class="q-num">QUESTION ${qNum} / ${QUESTIONS.length}</div>
+          <div class="q-text">${q.question}</div>
+          <textarea class="textarea-input" id="textInput" placeholder="${q.placeholder}" maxlength="${q.maxLength}"></textarea>
+          <div class="char-count"><span id="charCount">0</span> / ${q.maxLength}</div>
+          <div class="btn-row">
+            <button class="btn" onclick="submitText('${q.id}')" id="textBtn" disabled>次へ →</button>
+            <span class="hint">10文字以上で送信できます</span>
+          </div>
+        </div>
+      `;
+      setTimeout(() => {
+        const input = document.getElementById('textInput');
+        const btn = document.getElementById('textBtn');
+        const count = document.getElementById('charCount');
+        input.addEventListener('input', () => {
+          count.textContent = input.value.length;
+          btn.disabled = input.value.trim().length < 10;
+        });
+        input.focus();
+      }, 100);
+    }
+  } else if (item.type === 'done') {
+    newScreen.classList.add('done');
+    const scores = scoreResponse(state.answers);
+    const rec = getRecommendation(scores);
+
+    // Save to localStorage
+    const submission = {
+      id: 'r_' + Date.now(),
+      name: state.answers['q_name']?.value || '名無し',
+      submittedAt: new Date().toISOString(),
+      totalTimeMs: Date.now() - state.startTime,
+      answers: state.answers,
+      questionTimes: state.questionTimes,
+      scores,
+      recommendation: rec,
+    };
+    const list = JSON.parse(localStorage.getItem('aptitude_responses') || '[]');
+    list.push(submission);
+    localStorage.setItem('aptitude_responses', JSON.stringify(list));
+
+    newScreen.innerHTML = `
+      <div class="inner">
+        <div class="check">✓</div>
+        <h2>ありがとうございました</h2>
+        <p>あなたの回答を受け付けました。<br>結果はサロン側で確認します。</p>
+        <div class="scores">
+          <div class="q-num" style="margin-bottom:14px">YOUR PROFILE (参考表示)</div>
+          ${[
+            { key: 'initiative', label: '主体性' },
+            { key: 'cooperation', label: '協調性' },
+            { key: 'optimism', label: '楽観性' },
+          ].map((c) => `
+            <div class="score-row">
+              <div class="score-label">${c.label}</div>
+              <div class="score-bar"><div class="score-fill" style="width:${scores[c.key]}%"></div></div>
+              <div class="score-num">${scores[c.key]}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  screensEl.appendChild(newScreen);
+  // Trigger animation
+  requestAnimationFrame(() => {
+    if (oldScreen) oldScreen.classList.add('exit');
+    setTimeout(() => oldScreen?.remove(), 450);
+    newScreen.classList.add('active');
+  });
+
+  state.questionStartTime = Date.now();
+  updateProgress();
+}
+
+function selectOption(qid, value) {
+  // Visually mark selected
+  document.querySelectorAll('.option').forEach((el) => {
+    if (el.dataset.value === value) el.classList.add('selected');
+  });
+  const elapsed = Date.now() - state.questionStartTime;
+  state.answers[qid] = { value, timeMs: elapsed };
+  state.questionTimes[qid] = elapsed;
+  // Brief delay so user sees the selection feedback
+  setTimeout(next, 350);
+}
+
+function submitText(qid) {
+  const input = document.getElementById('textInput');
+  const value = input.value.trim();
+  if (!value) return;
+  const elapsed = Date.now() - state.questionStartTime;
+  state.answers[qid] = { value, timeMs: elapsed };
+  state.questionTimes[qid] = elapsed;
+  next();
+}
+
+function next() {
+  state.current++;
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eye mor 管理ダッシュボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f1ea;
+  --ink:#1a1a1a;
+  --ink-soft:#5a5a5a;
+  --paper:#ffffff;
+  --accent:#ff5b3a;
+  --gold:#b8923f;
+  --line:rgba(0,0,0,0.08);
+  --good:#27ae60;
+  --warn:#e67e22;
+  --bad:#c0392b;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"palt";
+  padding-bottom:60px;
+}
+
+/* ヘッダー */
+.header{
+  background:var(--ink);color:#fff;
+  padding:24px 20px 28px;
+  position:sticky;top:0;z-index:50;
+}
+.header .brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;font-weight:600;letter-spacing:.06em;
+}
+.header .sub{
+  font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.6);
+  margin-top:2px;
+}
+.header h1{
+  font-size:18px;font-weight:700;margin-top:14px;
+}
+.stats{
+  display:flex;gap:14px;margin-top:14px;
+}
+.stat{flex:1;background:rgba(255,255,255,.08);padding:10px 12px;border-radius:10px}
+.stat-label{font-size:10px;letter-spacing:.1em;opacity:.6;margin-bottom:2px}
+.stat-value{font-size:20px;font-weight:700}
+
+/* 一覧 */
+.list{padding:16px}
+.candidate{
+  background:var(--paper);
+  border-radius:14px;
+  padding:18px;margin-bottom:12px;
+  border:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+  cursor:pointer;
+  transition:transform .15s, box-shadow .15s;
+}
+.candidate:active{transform:scale(.99)}
+.candidate-head{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:14px;
+}
+.avatar{
+  width:46px;height:46px;border-radius:50%;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:24px;color:var(--ink);
+  flex-shrink:0;
+  border:2px solid var(--avatar-color,var(--line));
+  box-shadow:0 2px 6px rgba(0,0,0,.04);
+}
+.avatar.initial{font-size:16px}
+.candidate-info{flex:1;min-width:0}
+.candidate-name{font-size:16px;font-weight:700;margin-bottom:2px}
+.candidate-time{font-size:11px;color:var(--ink-soft)}
+.rank{
+  padding:4px 10px;border-radius:999px;
+  font-size:11px;font-weight:700;color:#fff;
+  white-space:nowrap;
+}
+
+/* スコアバー */
+.score-row{
+  display:flex;align-items:center;gap:10px;
+  padding:4px 0;font-size:12px;
+}
+.score-label{
+  width:60px;color:var(--ink-soft);font-weight:500;
+}
+.score-bar-wrap{flex:1;height:6px;background:rgba(0,0,0,.05);border-radius:999px;overflow:hidden}
+.score-bar{
+  height:100%;background:var(--accent);
+  border-radius:999px;transition:width .8s cubic-bezier(.65,0,.35,1);
+}
+.score-bar.lie{background:var(--bad)}
+.score-num{
+  width:30px;text-align:right;
+  font-weight:700;font-size:13px;
+}
+
+.empty{
+  text-align:center;padding:80px 20px;
+  color:var(--ink-soft);
+}
+.empty .ico{font-size:48px;margin-bottom:14px;opacity:.4}
+.empty h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.empty p{font-size:13px;line-height:1.7}
+.empty .demo-btn{
+  background:var(--ink);color:#fff;
+  padding:10px 20px;border-radius:999px;
+  border:none;margin-top:18px;font-size:13px;
+  font-family:inherit;cursor:pointer;font-weight:700;
+}
+
+/* 詳細モーダル */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:200;display:none;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+}
+.modal-bg.active{display:block}
+.modal{
+  position:fixed;inset:0;background:var(--bg);
+  z-index:201;overflow-y:auto;
+  display:none;
+}
+.modal.active{display:block}
+.modal-head{
+  background:var(--ink);color:#fff;
+  padding:18px 20px;
+  position:sticky;top:0;z-index:1;
+  display:flex;align-items:center;gap:12px;
+}
+.close-btn{
+  background:rgba(255,255,255,.1);
+  color:#fff;border:none;width:32px;height:32px;
+  border-radius:50%;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-body{padding:20px;max-width:600px;margin:0 auto}
+.section{
+  background:var(--paper);border-radius:14px;
+  padding:18px;margin-bottom:14px;
+  border:1px solid var(--line);
+}
+.section-title{
+  font-size:11px;letter-spacing:.2em;color:var(--accent);
+  font-weight:700;margin-bottom:12px;
+}
+.detail-row{
+  display:flex;justify-content:space-between;
+  padding:6px 0;font-size:13px;border-bottom:1px solid var(--line);
+}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--ink-soft)}
+.detail-value{font-weight:500}
+
+/* タイプ診断カード */
+.type-card{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--ink),#2a2a2a);
+  color:#fff;border-radius:16px;padding:22px 20px 20px;
+  margin-bottom:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+}
+.type-card::before{
+  content:'';position:absolute;inset:0 0 auto 0;height:4px;
+  background:var(--fit-color,var(--accent));
+}
+.type-card .type-tagline{
+  font-size:11px;letter-spacing:.2em;
+  color:var(--fit-color,var(--accent));
+  font-weight:700;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.type-card .type-row{
+  display:flex;align-items:center;gap:18px;
+}
+.type-card .type-icon{
+  font-size:64px;line-height:1;flex-shrink:0;
+  filter:drop-shadow(0 2px 8px rgba(255,255,255,.2));
+}
+.type-card .type-meta{flex:1;min-width:0}
+.type-card .type-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:30px;font-weight:600;letter-spacing:.04em;
+  line-height:1.1;margin-bottom:6px;
+}
+.type-card .type-jp{
+  font-family:'Noto Sans JP',sans-serif;
+  font-size:15px;font-weight:700;
+  color:rgba(255,255,255,.85);
+}
+.type-card .type-stars{
+  font-size:14px;letter-spacing:.15em;
+  color:var(--fit-color,var(--accent));
+  margin-top:6px;
+}
+.type-card .type-desc{
+  font-size:13px;line-height:1.85;
+  color:rgba(255,255,255,.78);
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.type-card .fit-badge{
+  display:inline-block;margin-top:12px;
+  padding:4px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;letter-spacing:.1em;
+  background:var(--fit-color,var(--accent));
+  color:#fff;
+}
+
+.warn-box{
+  background:#fff4e8;border:1px solid var(--warn);
+  border-radius:10px;padding:12px 14px;font-size:13px;
+  color:#8a4d18;margin-top:10px;line-height:1.7;
+}
+.warn-box.danger{background:#ffe8e5;border-color:var(--bad);color:#8a2820}
+.warn-box .label{font-weight:700;margin-bottom:4px;display:block}
+
+.qa-item{
+  padding:12px 0;border-bottom:1px solid var(--line);
+}
+.qa-item:last-child{border-bottom:none}
+.qa-q{font-size:13px;color:var(--ink-soft);margin-bottom:6px;line-height:1.6}
+.qa-a{font-size:14px;font-weight:500;line-height:1.6}
+.qa-meta{font-size:11px;color:var(--ink-soft);margin-top:4px}
+.qa-meta .fast{color:var(--good)}
+.qa-meta .slow{color:var(--warn)}
+.qa-tag{
+  display:inline-block;padding:2px 8px;border-radius:999px;
+  font-size:10px;font-weight:700;margin-left:6px;
+  background:var(--bg);
+}
+.qa-tag.lie{background:#ffe8e5;color:var(--bad)}
+.episode-text{
+  background:var(--bg);padding:12px 14px;border-radius:10px;
+  font-size:14px;line-height:1.8;margin-top:6px;
+}
+.keyword-pill{
+  display:inline-block;padding:2px 8px;border-radius:999px;
+  font-size:11px;font-weight:500;margin:2px;
+}
+.keyword-pill.pos{background:#e6f7ed;color:var(--good)}
+.keyword-pill.neg{background:#ffe8e5;color:var(--bad)}
+
+.action-row{
+  display:flex;gap:8px;padding:14px 0;
+}
+.action-btn{
+  flex:1;background:var(--paper);
+  border:1px solid var(--line);border-radius:10px;
+  padding:10px;font-size:12px;font-weight:700;
+  font-family:inherit;cursor:pointer;color:var(--ink);
+}
+.action-btn.danger{color:var(--bad);border-color:var(--bad)}
+
+/* デモコントロール */
+.demo-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--ink);color:#fff;
+  padding:10px 16px;
+  display:flex;gap:8px;align-items:center;
+  font-size:11px;z-index:60;
+  border-top:1px solid rgba(255,255,255,.1);
+}
+.demo-bar .label{flex:1;opacity:.7;letter-spacing:.05em}
+.demo-bar button{
+  background:rgba(255,255,255,.1);color:#fff;
+  border:1px solid rgba(255,255,255,.2);
+  padding:6px 12px;border-radius:6px;
+  font-size:11px;font-family:inherit;cursor:pointer;
+  font-weight:500;
+}
+.demo-bar button:hover{background:rgba(255,255,255,.2)}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">eye mor</div>
+  <div class="sub">ADMIN DASHBOARD</div>
+  <h1>適性検査 受験者一覧</h1>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">TOTAL</div>
+      <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">RECOMMENDED</div>
+      <div class="stat-value" id="statRec">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">CAUTION</div>
+      <div class="stat-value" id="statWarn">0</div>
+    </div>
+  </div>
+</header>
+
+<div class="list" id="list"></div>
+
+<div class="modal-bg" id="modalBg" onclick="closeModal()"></div>
+<div class="modal" id="modal">
+  <div class="modal-head">
+    <button class="close-btn" onclick="closeModal()">×</button>
+    <div>
+      <div style="font-size:11px;letter-spacing:.2em;opacity:.6">CANDIDATE DETAIL</div>
+      <div style="font-size:16px;font-weight:700;margin-top:2px" id="modalName"></div>
+    </div>
+  </div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+
+<div class="demo-bar">
+  <span class="label">DEMO MODE — localStorage保存</span>
+  <button onclick="seedDemo()">デモデータ追加</button>
+  <button onclick="clearAll()">全削除</button>
+  <button onclick="window.location.href='index.html'">フォーム→</button>
+</div>
+
+<script src="questions.js"></script>
+<script>
+function getResponses() {
+  return JSON.parse(localStorage.getItem('aptitude_responses') || '[]');
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  const m = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  const h = d.getHours().toString().padStart(2, '0');
+  const min = d.getMinutes().toString().padStart(2, '0');
+  return `${m}/${day} ${h}:${min}`;
+}
+
+function renderList() {
+  const list = getResponses().sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+  const listEl = document.getElementById('list');
+  document.getElementById('statTotal').textContent = list.length;
+  document.getElementById('statRec').textContent = list.filter((r) => r.recommendation.stars >= 4).length;
+  document.getElementById('statWarn').textContent = list.filter((r) => r.recommendation.stars <= 2 || r.scores.lie >= 67).length;
+
+  if (list.length === 0) {
+    listEl.innerHTML = `
+      <div class="empty">
+        <div class="ico">◌</div>
+        <h3>まだ受験者がいません</h3>
+        <p>下の「フォーム→」から検査を試すか、<br>「デモデータ追加」でサンプルを表示できます</p>
+        <button class="demo-btn" onclick="seedDemo()">デモデータを追加</button>
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = list.map((r) => {
+    const t = r.recommendation.type || diagnoseType(r.scores);
+    const fitColor = (typeof FIT_COLORS !== 'undefined' && FIT_COLORS[t.fit]) || '#888';
+    return `
+      <div class="candidate" onclick="openDetail('${r.id}')">
+        <div class="candidate-head">
+          <div class="avatar" style="--avatar-color:${fitColor}">${t.icon}</div>
+          <div class="candidate-info">
+            <div class="candidate-name">${escape(r.name)}</div>
+            <div class="candidate-time">${formatDate(r.submittedAt)} • 所要 ${Math.round(r.totalTimeMs / 1000)}秒</div>
+          </div>
+          <div class="rank" style="background:${fitColor}">${escape(t.name)}</div>
+        </div>
+        <div class="scores">
+          ${scoreBar('主体性', r.scores.initiative)}
+          ${scoreBar('協調性', r.scores.cooperation)}
+          ${scoreBar('楽観性', r.scores.optimism)}
+          ${r.scores.lie >= 50 ? scoreBar('取り繕い', r.scores.lie, true) : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function scoreBar(label, val, isLie = false) {
+  return `
+    <div class="score-row">
+      <div class="score-label">${label}</div>
+      <div class="score-bar-wrap"><div class="score-bar ${isLie ? 'lie' : ''}" style="width:${val}%"></div></div>
+      <div class="score-num">${val}</div>
+    </div>
+  `;
+}
+
+function escape(s) {
+  return String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// 6軸レーダーチャート(SVG)
+function radarChart(scores) {
+  const axes = [
+    { key: 'initiative',    label: '主体性' },
+    { key: 'cooperation',   label: '協調性' },
+    { key: 'optimism',      label: '楽観性' },
+    { key: 'communication', label: 'コミュ力' },
+    { key: 'flexibility',   label: '柔軟性' },
+    { key: 'resilience',    label: 'ストレス耐性' },
+  ];
+  const size = 320;
+  const cx = size / 2, cy = size / 2;
+  const maxR = 100;
+  const labelR = maxR + 32;
+  const angle = (i) => (Math.PI * 2 * i) / axes.length - Math.PI / 2;
+  const point = (i, r) => [cx + Math.cos(angle(i)) * r, cy + Math.sin(angle(i)) * r];
+
+  const grid = [0.25, 0.5, 0.75, 1.0].map((lv) => {
+    const pts = axes.map((_, i) => point(i, maxR * lv).join(',')).join(' ');
+    return `<polygon points="${pts}" fill="${lv === 1 ? 'rgba(0,0,0,0.02)' : 'none'}" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>`;
+  }).join('');
+
+  const axisLines = axes.map((_, i) => {
+    const [x, y] = point(i, maxR);
+    return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>`;
+  }).join('');
+
+  const scorePts = axes.map((a, i) => point(i, ((scores[a.key] || 0) / 100) * maxR).join(',')).join(' ');
+
+  const scoreDots = axes.map((a, i) => {
+    const [x, y] = point(i, ((scores[a.key] || 0) / 100) * maxR);
+    return `<circle cx="${x}" cy="${y}" r="3.5" fill="#ff5b3a"/>`;
+  }).join('');
+
+  const labels = axes.map((a, i) => {
+    const [x, y] = point(i, labelR);
+    const v = scores[a.key] || 0;
+    return `
+      <text x="${x}" y="${y - 4}" text-anchor="middle" font-size="11" font-weight="500" fill="#5a5a5a" font-family="'Noto Sans JP',sans-serif">${a.label}</text>
+      <text x="${x}" y="${y + 12}" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a1a" font-family="'Noto Sans JP',sans-serif">${v}</text>
+    `;
+  }).join('');
+
+  return `
+    <svg viewBox="0 0 ${size} ${size}" width="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="display:block;max-width:340px;margin:0 auto">
+      ${grid}
+      ${axisLines}
+      <polygon points="${scorePts}" fill="rgba(255,91,58,0.18)" stroke="#ff5b3a" stroke-width="2" stroke-linejoin="round"/>
+      ${scoreDots}
+      ${labels}
+    </svg>
+  `;
+}
+
+function openDetail(id) {
+  const r = getResponses().find((x) => x.id === id);
+  if (!r) return;
+  document.getElementById('modalName').textContent = r.name;
+
+  const body = document.getElementById('modalBody');
+
+  // 平均回答時間
+  const times = Object.values(r.questionTimes || {}).filter((t) => t > 0);
+  const avgTime = times.length ? Math.round(times.reduce((a, b) => a + b, 0) / times.length / 1000 * 10) / 10 : 0;
+
+  const t = r.recommendation.type || diagnoseType(r.scores);
+  const fitColor = (typeof FIT_COLORS !== 'undefined' && FIT_COLORS[t.fit]) || '#ff5b3a';
+  const fitLabel = { best: 'BEST FIT', good: 'GOOD FIT', ok: 'OK FIT', bad: 'NOT FIT', caution: 'CAUTION' }[t.fit] || 'FIT';
+
+  body.innerHTML = `
+    <div class="type-card" style="--fit-color:${fitColor}">
+      <div class="type-tagline">${escape(t.tagline)}</div>
+      <div class="type-row">
+        <div class="type-icon">${t.icon}</div>
+        <div class="type-meta">
+          <div class="type-name">${escape(t.type)}</div>
+          <div class="type-jp">${escape(t.name)}</div>
+          <div class="type-stars">${'★'.repeat(t.stars)}${'☆'.repeat(5 - t.stars)}</div>
+        </div>
+      </div>
+      <div class="type-desc">${escape(t.desc)}</div>
+      <span class="fit-badge">${fitLabel}</span>
+    </div>
+
+    <div class="section">
+      <div class="section-title">PERSONALITY RADAR</div>
+      ${radarChart(r.scores)}
+    </div>
+
+    <div class="section">
+      <div class="section-title">SCORE BREAKDOWN</div>
+      ${scoreBar('主体性', r.scores.initiative)}
+      ${scoreBar('協調性', r.scores.cooperation)}
+      ${scoreBar('楽観性', r.scores.optimism)}
+      ${scoreBar('慎重さ', r.scores.detail)}
+      ${scoreBar('取り繕い', r.scores.lie, true)}
+    </div>
+
+    ${r.scores.lie >= 67 ? `
+      <div class="warn-box danger">
+        <span class="label">⚠ 取り繕い傾向が高い</span>
+        ライスケール（嘘発見質問）で「はい」を多く選択しています。回答を額面通り信用しない方が良いです。
+      </div>
+    ` : ''}
+
+    ${r.scores.optimism < 30 ? `
+      <div class="warn-box">
+        <span class="label">⚠ 楽観性が低い</span>
+        eye morの欲しい人物像（ポジティブで楽観的）から離れる可能性があります。
+      </div>
+    ` : ''}
+
+    <div class="section">
+      <div class="section-title">META</div>
+      <div class="detail-row">
+        <span class="detail-label">受験日時</span>
+        <span class="detail-value">${formatDate(r.submittedAt)}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">総所要時間</span>
+        <span class="detail-value">${Math.round(r.totalTimeMs / 1000)}秒</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">1問あたり平均</span>
+        <span class="detail-value">${avgTime}秒</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">ALL ANSWERS</div>
+      ${QUESTIONS.map((q) => {
+        const ans = r.answers[q.id];
+        if (!ans) return '';
+        const t = (ans.timeMs / 1000).toFixed(1);
+        const speed = ans.timeMs < 3000 ? 'fast' : ans.timeMs > 10000 ? 'slow' : '';
+        const speedLabel = ans.timeMs < 3000 ? '⚡即答' : ans.timeMs > 10000 ? '🤔長考' : '';
+        const isLie = q.category === 'lie-scale' && ans.value === 'yes';
+
+        if (q.type === 'episode' || q.type === 'text') {
+          return `
+            <div class="qa-item">
+              <div class="qa-q">${q.question}</div>
+              <div class="episode-text">${escape(ans.value)}</div>
+              <div class="qa-meta">
+                ${ans.value.length}文字 • ${t}秒 <span class="${speed}">${speedLabel}</span>
+              </div>
+            </div>
+          `;
+        }
+
+        const opt = q.options.find((o) => o.value === ans.value);
+        return `
+          <div class="qa-item">
+            <div class="qa-q">${q.question}</div>
+            <div class="qa-a">
+              ${ans.value}. ${escape(opt?.text || '')}
+              ${isLie ? '<span class="qa-tag lie">嘘の可能性</span>' : ''}
+            </div>
+            <div class="qa-meta">
+              ${t}秒 <span class="${speed}">${speedLabel}</span>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="action-row">
+      <button class="action-btn danger" onclick="deleteRecord('${r.id}')">この回答を削除</button>
+    </div>
+  `;
+
+  document.getElementById('modalBg').classList.add('active');
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('active');
+  document.getElementById('modal').classList.remove('active');
+}
+
+function deleteRecord(id) {
+  if (!confirm('この回答を削除しますか？')) return;
+  const list = getResponses().filter((r) => r.id !== id);
+  localStorage.setItem('aptitude_responses', JSON.stringify(list));
+  closeModal();
+  renderList();
+}
+
+function clearAll() {
+  if (!confirm('全データを削除しますか？')) return;
+  localStorage.removeItem('aptitude_responses');
+  renderList();
+}
+
+// デモ用ダミーデータ ── 主要タイプを網羅
+function seedDemo() {
+  const samples = [
+    {
+      name: '田中 さくら',
+      prefs: { initiative: 1.5, optimism: 1.5, cooperation: 1.7, communication: 0.5, flexibility: 1.5, resilience: 1.0 }, // → 太陽
+      lieRate: 0,
+      timeBase: 2000,
+      effort: '高校のときバスケ部で副キャプテンやってて、3年間毎朝6時から朝練続けたこと！最初は本当しんどかったけど、仲間と励まし合って続けてたら最後の大会で県ベスト4まで行けた。あの3年があるから、何でも続ければ結果出るって信じられるようになった。今もこれが自分の自信になってる。',
+    },
+    {
+      name: '高橋 ゆい',
+      prefs: { cooperation: 1.4, optimism: 1.0, communication: 1.2 }, // → 桜
+      lieRate: 0,
+      timeBase: 3500,
+      effort: '美容学校に通いながら週5でカフェのバイトを2年続けたことです。学費を自分で払いたくて始めたんですが、課題と両立するのが本当に大変で何度も心折れそうになりました。でも同じ目標で頑張ってる友達の存在に支えられて、卒業のとき皆勤賞もらえました。人に支えられた分、今度は自分も誰かを支えたいなと思っています。',
+    },
+    {
+      name: '渡辺 れい',
+      prefs: { initiative: 1.5, optimism: 1.2, cooperation: -0.5 }, // → 流星
+      lieRate: 0,
+      timeBase: 1800,
+      effort: '高校時代に独学でネイル始めて、2年で1級取ったこと。最初は学校の友達にやって練習してて、SNSで発信してたら個人で予約くれる人が増えた。誰にも教わらずに調べて試して失敗して、を繰り返した。1人で完結させる癖がついたのはこの時期。技術は裏切らないって学んだ。',
+    },
+    {
+      name: '鈴木 あや',
+      prefs: { detail: 3.0, resilience: 3.5, initiative: -1.5, cooperation: -2.0, optimism: 0.5 }, // → 岩
+      lieRate: 0.1,
+      timeBase: 8500,
+      effort: '大学受験の勉強です。1年浪人しまして、毎日12時間以上、計画表を作って科目ごとに時間配分を決めて取り組みました。模試の結果は週ごとに記録し、苦手分野は問題集を3周以上解き直しました。結果的に第一志望には届きませんでしたが、計画通りに継続することの大切さを学びました。今でも何かに取り組むときは必ず計画から立てるようにしています。',
+    },
+    {
+      name: '佐藤 みか',
+      prefs: { cooperation: 1.0, optimism: 0.8 }, // → 桜寄り、ただしlie大量
+      lieRate: 1.0, // 全部はい → 霧
+      timeBase: 5000,
+      effort: '今までの人生でずっと努力してきました。小学校から大学までずっと真面目に頑張ってきましたし、今もどんなことにも全力で取り組んでいます。人より努力していると自負しています。',
+    },
+    {
+      name: '中村 みお',
+      prefs: { optimism: -1.0, resilience: -1.0, detail: 0.8 }, // → 雨
+      lieRate: 0.1,
+      timeBase: 11000,
+      effort: 'うーん…特にこれといって思いつかないです。普通に学校に通って、バイトもそれなりにやってきたくらいで、誇れるようなことはあまりないかも。',
+    },
+  ];
+
+  const list = getResponses();
+  for (const s of samples) {
+    const answers = generatePattern(s.prefs, s.lieRate, s.timeBase, {
+      q_effort: s.effort,
+    });
+    answers['q_name'] = { value: s.name, timeMs: 4000 };
+    const scores = scoreResponse(answers);
+    const rec = getRecommendation(scores);
+    list.push({
+      id: 'r_demo_' + Math.random().toString(36).slice(2, 9),
+      name: s.name,
+      submittedAt: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString(),
+      totalTimeMs: 180000 + Math.random() * 180000,
+      answers,
+      questionTimes: Object.fromEntries(Object.entries(answers).map(([k, v]) => [k, v.timeMs])),
+      scores,
+      recommendation: rec,
+    });
+  }
+  localStorage.setItem('aptitude_responses', JSON.stringify(list));
+  renderList();
+}
+
+// preferences(prefs)を最大化する選択肢を選ぶ
+// prefs: {trait: weight} 例 {initiative: 1.2, detail: -0.5}
+// lieRate: 0-1, ライスケールで「はい」を選ぶ確率
+// timeBaseMs: 1問あたりの基準回答時間
+function generatePattern(prefs, lieRate, timeBaseMs, episodes) {
+  const answers = {};
+  for (const q of QUESTIONS) {
+    if (q.type === 'text') continue;
+    if (q.type === 'episode') {
+      const text = (episodes && episodes[q.id]) || '';
+      answers[q.id] = { value: text, timeMs: 20000 + Math.random() * 30000 };
+      continue;
+    }
+    let chosen;
+    if (q.category === 'lie-scale') {
+      chosen = q.options.find((o) => o.value === (Math.random() < lieRate ? 'yes' : 'no'));
+    } else {
+      let bestScore = -Infinity;
+      for (const opt of q.options) {
+        let score = 0;
+        for (const [trait, val] of Object.entries(opt.traits || {})) {
+          const w = prefs[trait];
+          if (w !== undefined) score += w * val;
+        }
+        score += (Math.random() - 0.5) * 0.1; // 同点時のばらけ用
+        if (score > bestScore) { bestScore = score; chosen = opt; }
+      }
+    }
+    if (!chosen) chosen = q.options[0];
+    answers[q.id] = { value: chosen.value, timeMs: timeBaseMs + Math.random() * 4000 };
+  }
+  return answers;
+}
+
+renderList();
+</script>
+
+</body>
+</html>
