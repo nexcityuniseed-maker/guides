@@ -239,12 +239,16 @@ const QUESTIONS = [
     ],
   },
 
-  // ========== ⑦ 自由記述 (1問・最終) ==========
+  // ========== ⑦ 過去の頑張った経験 (1問・最終) ==========
   {
-    id: 'q_effort', type: 'episode', category: 'grit',
-    question: '今までの人生で一番努力したこと・頑張ったことは何ですか？',
-    placeholder: 'いつ・何を・どれくらいの期間・なぜ頑張れたか、300字以内で',
-    maxLength: 300,
+    id: 'q_effort', type: 'forced-choice', category: 'grit',
+    question: '今までの人生で一番頑張ったのはどんなこと？',
+    options: [
+      { value: 'A', text: '部活動・スポーツ（チームで打ち込んだ）', traits: { cooperation: 2, resilience: 1 } },
+      { value: 'B', text: '勉強・受験・資格取得', traits: { detail: 1, resilience: 2 } },
+      { value: 'C', text: 'アルバイト・お金を稼いで自立する経験', traits: { initiative: 2, cooperation: 1 } },
+      { value: 'D', text: '趣味・推し活・好きなことを極めた', traits: { optimism: 2, initiative: 1 } },
+    ],
   },
 ];
 
