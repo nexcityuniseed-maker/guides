@@ -250,6 +250,58 @@ const QUESTIONS = [
       { value: 'D', text: '趣味・推し活・好きなことを極めた', traits: { optimism: 2, initiative: 1 } },
     ],
   },
+
+  // ========== ⑧ ストレス耐性・回復力 (3問) ==========
+  // 反芻思考・孤立傾向・自己批判過多をresilienceスコアで検出
+  {
+    id: 'q_stress1', type: 'forced-choice', category: 'resilience',
+    question: '強いストレスを感じたとき、私は',
+    options: [
+      { value: 'A', text: '友達や家族に話して整理する', traits: { cooperation: 2, resilience: 2, communication: 1 } },
+      { value: 'B', text: '一人で抱え込んで考え込む', traits: { detail: 1 } },
+    ],
+  },
+  {
+    id: 'q_stress2', type: 'forced-choice', category: 'resilience',
+    question: '失敗が頭から離れない夜、私は',
+    options: [
+      { value: 'A', text: '早く寝る・気晴らしして切り替える', traits: { optimism: 2, resilience: 2 } },
+      { value: 'B', text: '何度も振り返って考え続ける', traits: { detail: 2 } },
+    ],
+  },
+  {
+    id: 'q_stress3', type: 'forced-choice', category: 'resilience',
+    question: '自分のことを「ダメだな」と思うのは',
+    options: [
+      { value: 'A', text: 'たまにある（普通だと思う）', traits: { resilience: 2, optimism: 1 } },
+      { value: 'B', text: 'しょっちゅうある', traits: { detail: 1 } },
+    ],
+  },
+
+  // ========== ⑨ MBTI (任意・情報のみ・スコア影響なし) ==========
+  {
+    id: 'q_mbti', type: 'dropdown', category: 'meta',
+    question: 'あなたのMBTIタイプを教えてください（任意）',
+    options: [
+      'わからない・受けたことがない',
+      'INTJ（建築家）',
+      'INTP（論理学者）',
+      'ENTJ（指揮官）',
+      'ENTP（討論者）',
+      'INFJ（提唱者）',
+      'INFP（仲介者）',
+      'ENFJ（主人公）',
+      'ENFP（運動家）',
+      'ISTJ（管理者）',
+      'ISFJ（擁護者）',
+      'ESTJ（幹部）',
+      'ESFJ（領事官）',
+      'ISTP（巨匠）',
+      'ISFP（冒険家）',
+      'ESTP（起業家）',
+      'ESFP（エンターテイナー）',
+    ],
+  },
 ];
 
 // ========== 採点ロジック ==========
