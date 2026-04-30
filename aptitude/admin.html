@@ -643,13 +643,13 @@ function openDetail(id) {
         const speedLabel = ans.timeMs < 3000 ? '⚡即答' : ans.timeMs > 10000 ? '🤔長考' : '';
         const isLie = q.category === 'lie-scale' && ans.value === 'yes';
 
-        if (q.type === 'episode' || q.type === 'text') {
+        if (q.type === 'episode' || q.type === 'text' || q.type === 'dropdown') {
           return `
             <div class="qa-item">
               <div class="qa-q">${q.question}</div>
               <div class="episode-text">${escape(ans.value)}</div>
               <div class="qa-meta">
-                ${ans.value.length}文字 • ${t}秒 <span class="${speed}">${speedLabel}</span>
+                ${q.type === 'dropdown' ? '' : `${ans.value.length}文字 • `}${t}秒 <span class="${speed}">${speedLabel}</span>
               </div>
             </div>
           `;
@@ -783,6 +783,12 @@ function generatePattern(prefs, lieRate, timeBaseMs, episodes) {
     if (q.type === 'episode') {
       const text = (episodes && episodes[q.id]) || '';
       answers[q.id] = { value: text, timeMs: 20000 + Math.random() * 30000 };
+      continue;
+    }
+    if (q.type === 'dropdown') {
+      // ランダムに1つ選ぶ (MBTI等は採点に影響しないので適当でOK)
+      const pick = q.options[Math.floor(Math.random() * q.options.length)];
+      answers[q.id] = { value: pick, timeMs: 5000 + Math.random() * 5000 };
       continue;
     }
     let chosen;
