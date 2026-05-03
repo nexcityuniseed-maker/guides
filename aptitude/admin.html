@@ -354,15 +354,13 @@ body{
 </head>
 <body>
 
-<!-- ログイン画面 (Supabaseモード時のみ表示) -->
+<!-- ログイン画面 (パスワードゲート) -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
     <div class="brand">eye mor</div>
     <div class="sub">ADMIN LOGIN</div>
     <h2>管理画面へログイン</h2>
-    <p>Supabaseに登録した管理者アカウントでログインしてください。</p>
-    <label>メールアドレス</label>
-    <input type="email" id="loginEmail" autocomplete="email" placeholder="admin@example.com">
+    <p>パスワードを入力してください。</p>
     <label>パスワード</label>
     <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••">
     <button class="login-btn" id="loginBtn" onclick="handleLogin()">ログイン</button>
@@ -812,71 +810,53 @@ function generatePattern(prefs, lieRate, timeBaseMs, episodes) {
   return answers;
 }
 
-// ========== 認証 + 初期化 ==========
+// ========== パスワード認証 + 初期化 ==========
+const ADMIN_PASSWORD = 'bwcesn';
+const SESSION_KEY = 'aptitude_admin_authed';
+
 function showLogin() {
   document.getElementById('loginOverlay').classList.add('active');
   document.getElementById('logoutBtn').style.display = 'none';
+  setTimeout(() => document.getElementById('loginPassword').focus(), 50);
 }
 function hideLogin() {
   document.getElementById('loginOverlay').classList.remove('active');
-  document.getElementById('logoutBtn').style.display = Storage.isCloud ? 'block' : 'none';
+  document.getElementById('logoutBtn').style.display = 'block';
+}
+
+function isAuthed() {
+  return sessionStorage.getItem(SESSION_KEY) === '1';
 }
 
 async function handleLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginErr');
-  const btn = document.getElementById('loginBtn');
   errEl.classList.remove('show');
-  if (!email || !password) {
-    errEl.textContent = 'メールアドレスとパスワードを入力してください。';
-    errEl.classList.add('show');
-    return;
-  }
-  btn.disabled = true;
-  btn.textContent = 'ログイン中...';
-  try {
-    await Auth.signIn(email, password);
+  if (password === ADMIN_PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('loginPassword').value = '';
     hideLogin();
     await refreshAndRender();
-  } catch (e) {
-    errEl.textContent = 'ログインに失敗しました: ' + (e.message || 'メールまたはパスワードが違います');
+  } else {
+    errEl.textContent = 'パスワードが違います';
     errEl.classList.add('show');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'ログイン';
   }
 }
 
-async function handleLogout() {
+function handleLogout() {
   if (!confirm('ログアウトしますか？')) return;
-  await Auth.signOut();
+  sessionStorage.removeItem(SESSION_KEY);
   currentList = [];
   showLogin();
 }
 
 async function init() {
   Storage.init();
-  if (Storage.isCloud) {
-    const session = await Auth.getSession();
-    if (session) {
-      hideLogin();
-      await refreshAndRender();
-    } else {
-      showLogin();
-    }
-    Auth.onChange(async (sess) => {
-      if (sess) {
-        hideLogin();
-        await refreshAndRender();
-      } else {
-        showLogin();
-      }
-    });
-  } else {
-    // localStorageモード: 認証なしで即表示
+  if (isAuthed()) {
     hideLogin();
     await refreshAndRender();
+  } else {
+    showLogin();
   }
 }
 
