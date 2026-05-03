@@ -811,8 +811,9 @@ function generatePattern(prefs, lieRate, timeBaseMs, episodes) {
 }
 
 // ========== パスワード認証 + 初期化 ==========
-const ADMIN_PASSWORD = 'bwcesn';
-const SESSION_KEY = 'aptitude_admin_authed';
+// メールはハードコード、ユーザーはパスワードだけ入力。
+// 内部的にSupabase Authを呼ぶことでRLS(authenticatedのみ閲覧可)を維持。
+const ADMIN_EMAIL = 'admin@eyemor.app';
 
 function showLogin() {
   document.getElementById('loginOverlay').classList.add('active');
@@ -821,42 +822,63 @@ function showLogin() {
 }
 function hideLogin() {
   document.getElementById('loginOverlay').classList.remove('active');
-  document.getElementById('logoutBtn').style.display = 'block';
-}
-
-function isAuthed() {
-  return sessionStorage.getItem(SESSION_KEY) === '1';
+  document.getElementById('logoutBtn').style.display = Storage.isCloud ? 'block' : 'none';
 }
 
 async function handleLogin() {
   const password = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginErr');
+  const btn = document.getElementById('loginBtn');
   errEl.classList.remove('show');
-  if (password === ADMIN_PASSWORD) {
-    sessionStorage.setItem(SESSION_KEY, '1');
+  if (!password) {
+    errEl.textContent = 'パスワードを入力してください';
+    errEl.classList.add('show');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'ログイン中...';
+  try {
+    await Auth.signIn(ADMIN_EMAIL, password);
     document.getElementById('loginPassword').value = '';
     hideLogin();
     await refreshAndRender();
-  } else {
+  } catch (e) {
     errEl.textContent = 'パスワードが違います';
     errEl.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'ログイン';
   }
 }
 
-function handleLogout() {
+async function handleLogout() {
   if (!confirm('ログアウトしますか？')) return;
-  sessionStorage.removeItem(SESSION_KEY);
+  await Auth.signOut();
   currentList = [];
   showLogin();
 }
 
 async function init() {
   Storage.init();
-  if (isAuthed()) {
+  if (Storage.isCloud) {
+    const session = await Auth.getSession();
+    if (session) {
+      hideLogin();
+      await refreshAndRender();
+    } else {
+      showLogin();
+    }
+    Auth.onChange(async (sess) => {
+      if (sess) {
+        hideLogin();
+        await refreshAndRender();
+      } else {
+        showLogin();
+      }
+    });
+  } else {
     hideLogin();
     await refreshAndRender();
-  } else {
-    showLogin();
   }
 }
 
