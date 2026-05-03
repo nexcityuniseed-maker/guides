@@ -12,7 +12,14 @@ const Storage = {
       console.warn('Supabase JS SDK not loaded; falling back to localStorage');
       return false;
     }
-    this.client = window.supabase.createClient(cfg.url, cfg.anonKey);
+    this.client = window.supabase.createClient(cfg.url, cfg.anonKey, {
+      auth: {
+        // セッション永続化を無効化: ページを開く度にログインを要求する
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    });
     this.isCloud = true;
     return true;
   },
