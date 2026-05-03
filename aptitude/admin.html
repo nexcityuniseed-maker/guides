@@ -285,60 +285,136 @@ body{
 .demo-bar button:hover{background:rgba(255,255,255,.2)}
 
 /* ログイン画面 */
+/* ログイン画面: 可愛い系 */
 .login-overlay{
   position:fixed;inset:0;z-index:300;
-  background:var(--bg);
+  background:
+    radial-gradient(circle at 20% 10%, #ffe8e0 0%, transparent 45%),
+    radial-gradient(circle at 80% 90%, #ffeae3 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, #fff5ef 0%, #f5f1ea 70%);
   display:none;
   align-items:center;justify-content:center;
   padding:24px;
+  overflow:hidden;
 }
 .login-overlay.active{display:flex}
+/* 浮かぶ装飾 */
+.login-overlay::before,
+.login-overlay::after{
+  content:'';position:absolute;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,140,120,.18), transparent 70%);
+  pointer-events:none;
+}
+.login-overlay::before{
+  width:240px;height:240px;top:-40px;left:-40px;
+  animation:floatA 9s ease-in-out infinite;
+}
+.login-overlay::after{
+  width:280px;height:280px;bottom:-60px;right:-60px;
+  animation:floatB 11s ease-in-out infinite;
+}
+@keyframes floatA { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,30px)} }
+@keyframes floatB { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,-20px)} }
+
 .login-card{
+  position:relative;
   width:100%;max-width:380px;
-  background:var(--paper);
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:32px 28px 28px;
-  box-shadow:0 12px 36px rgba(0,0,0,.06);
+  background:#ffffff;
+  border:1px solid rgba(255,140,120,.15);
+  border-radius:28px;
+  padding:38px 30px 30px;
+  box-shadow:
+    0 20px 50px rgba(255,91,58,.10),
+    0 6px 16px rgba(0,0,0,.04),
+    inset 0 1px 0 rgba(255,255,255,.6);
+  animation:cardIn .6s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes cardIn {
+  0% { opacity:0; transform:translateY(20px) scale(.94); }
+  100% { opacity:1; transform:translateY(0) scale(1); }
+}
+/* 上部の小さな星キラキラ */
+.login-card .deco{
+  position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+  background:#fff;
+  border:1.5px solid rgba(255,140,120,.25);
+  border-radius:50%;
+  width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:var(--accent);
+  box-shadow:0 4px 12px rgba(255,91,58,.15);
 }
 .login-card .brand{
   font-family:'Cormorant Garamond',serif;
-  font-size:28px;font-weight:600;letter-spacing:.06em;
+  font-size:34px;font-weight:600;letter-spacing:.08em;
+  text-align:center;
+  background:linear-gradient(135deg,#1a1a1a 30%,#ff5b3a);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
 .login-card .sub{
-  font-size:11px;letter-spacing:.2em;color:var(--ink-soft);
-  margin-top:2px;margin-bottom:24px;
+  font-size:10px;letter-spacing:.32em;color:#c08775;
+  margin-top:4px;margin-bottom:22px;
+  text-align:center;font-weight:600;
 }
 .login-card h2{
-  font-size:18px;font-weight:700;margin-bottom:6px;
+  font-size:20px;font-weight:700;margin-bottom:6px;
+  text-align:center;letter-spacing:.05em;
 }
-.login-card p{font-size:13px;color:var(--ink-soft);margin-bottom:18px;line-height:1.7}
+.login-card h2 .heart{
+  color:var(--accent);font-size:16px;margin:0 4px;
+}
+.login-card p{
+  font-size:12px;color:var(--ink-soft);
+  margin-bottom:24px;line-height:1.7;text-align:center;
+}
 .login-card label{
-  display:block;font-size:11px;font-weight:700;
-  letter-spacing:.1em;color:var(--ink-soft);
-  margin-bottom:6px;margin-top:14px;
+  display:block;font-size:10px;font-weight:700;
+  letter-spacing:.2em;color:#c08775;
+  margin-bottom:8px;margin-top:14px;
+  text-transform:uppercase;
 }
 .login-card input{
-  width:100%;padding:12px 14px;
-  border:1.5px solid var(--line);border-radius:10px;
-  font-size:15px;font-family:inherit;
-  transition:border-color .15s;
+  width:100%;padding:14px 18px;
+  border:1.5px solid #f0e1db;border-radius:14px;
+  font-size:16px;font-family:inherit;
+  background:#fffaf7;
+  transition:all .2s;
   -webkit-appearance:none;
+  letter-spacing:.15em;
+  text-align:center;
 }
-.login-card input:focus{outline:none;border-color:var(--ink)}
+.login-card input:focus{
+  outline:none;border-color:var(--accent);
+  background:#fff;
+  box-shadow:0 0 0 4px rgba(255,91,58,.08);
+}
 .login-card .login-btn{
-  width:100%;margin-top:20px;
-  background:var(--ink);color:#fff;border:none;
-  padding:13px;border-radius:999px;
-  font-weight:700;font-size:14px;letter-spacing:.05em;
+  width:100%;margin-top:22px;
+  background:linear-gradient(135deg,#ff7a5e,#ff5b3a);
+  color:#fff;border:none;
+  padding:15px;border-radius:999px;
+  font-weight:700;font-size:14px;letter-spacing:.12em;
   cursor:pointer;font-family:inherit;
+  box-shadow:0 6px 18px rgba(255,91,58,.32);
+  transition:all .2s;
 }
-.login-card .login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-card .login-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 22px rgba(255,91,58,.42);
+}
+.login-card .login-btn:active{transform:translateY(0)}
+.login-card .login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .login-card .login-err{
-  font-size:12px;color:var(--bad);margin-top:10px;line-height:1.6;
-  display:none;
+  font-size:12px;color:var(--bad);margin-top:12px;line-height:1.6;
+  display:none;text-align:center;font-weight:500;
 }
 .login-card .login-err.show{display:block}
+.login-card .footer-deco{
+  text-align:center;margin-top:20px;
+  font-size:11px;color:#c8a89c;letter-spacing:.2em;
+}
 
 /* ログアウトボタン (ヘッダー右上) */
 .logout-btn{
@@ -357,14 +433,16 @@ body{
 <!-- ログイン画面 (パスワードゲート) -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
+    <div class="deco">✦</div>
     <div class="brand">eye mor</div>
-    <div class="sub">ADMIN LOGIN</div>
-    <h2>管理画面へログイン</h2>
-    <p>パスワードを入力してください。</p>
-    <label>パスワード</label>
+    <div class="sub">APTITUDE TEST</div>
+    <h2>適性検査 <span class="heart">♡</span> 管理画面</h2>
+    <p>パスワードを入力してログインしてください</p>
+    <label>Password</label>
     <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••">
-    <button class="login-btn" id="loginBtn" onclick="handleLogin()">ログイン</button>
+    <button class="login-btn" id="loginBtn" onclick="handleLogin()">✦ ログイン</button>
     <div class="login-err" id="loginErr"></div>
+    <div class="footer-deco">— for eye mor staff —</div>
   </div>
 </div>
 
