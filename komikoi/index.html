@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コミ恋 ｜ 大人のコミック・電子書籍レビューメディア</title>
+<meta name="description" content="コミ恋は、大人向け電子コミックを厳選してレビューする情報メディアです。ジャンル別おすすめ、セールの賢い買い方、初心者ガイドをお届けします。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf8f5;
+  --ink:#1f1b18;
+  --sub:#6b635c;
+  --line:#e6e0d8;
+  --accent:#b9425a;
+  --accent-soft:#f3e3e7;
+  --gold:#a8884e;
+  --card:#ffffff;
+  --maxw:1080px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans JP",sans-serif;
+  font-weight:300;
+  line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+a{color:inherit;text-decoration:none}
+
+/* ===== 年齢確認モーダル ===== */
+#age-gate{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(31,27,24,.96);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+#age-gate .box{
+  background:var(--bg);max-width:460px;width:100%;
+  padding:48px 36px;text-align:center;border-radius:4px;
+  border-top:3px solid var(--accent);
+}
+#age-gate h2{font-family:"Zen Maru Gothic",sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:8px;letter-spacing:.04em}
+#age-gate .en{font-family:"Outfit",sans-serif;color:var(--gold);letter-spacing:.12em;margin-bottom:20px}
+#age-gate p{font-size:.92rem;color:var(--sub);margin-bottom:28px;line-height:1.9}
+#age-gate .btns{display:flex;gap:12px;justify-content:center}
+#age-gate button{
+  font-family:"Noto Sans JP";font-size:.95rem;font-weight:500;
+  padding:14px 28px;border:none;cursor:pointer;border-radius:2px;
+  transition:.25s;
+}
+#age-gate .yes{background:var(--accent);color:#fff}
+#age-gate .yes:hover{background:#9a3149}
+#age-gate .no{background:transparent;color:var(--sub);border:1px solid var(--line)}
+#age-gate .no:hover{border-color:var(--sub)}
+
+/* ===== ヘッダー ===== */
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(250,248,245,.88);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+header .inner{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{font-family:"Zen Maru Gothic",sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:.08em}
+.logo span{color:var(--accent)}
+nav ul{display:flex;gap:30px;list-style:none}
+nav a{font-size:.86rem;font-weight:400;color:var(--sub);transition:.2s;position:relative}
+nav a:hover{color:var(--ink)}
+.nav-toggle{display:none;background:none;border:none;font-size:1.4rem;cursor:pointer}
+
+/* ===== ヒーロー ===== */
+.hero{padding:96px 0 80px;position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;right:-80px;top:-40px;width:420px;height:420px;
+  background:radial-gradient(circle,var(--accent-soft) 0%,transparent 70%);
+  z-index:0;
+}
+.hero .inner{position:relative;z-index:1;max-width:760px}
+.hero .label{font-family:"Outfit",sans-serif;font-size:1.1rem;color:var(--gold);letter-spacing:.18em;margin-bottom:18px}
+.hero h1{font-family:"Zen Maru Gothic",sans-serif;font-size:clamp(2rem,5vw,3.4rem);font-weight:900;line-height:1.4;letter-spacing:.02em;margin-bottom:24px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{font-size:1rem;color:var(--sub);max-width:560px;line-height:2}
+.hero .meta{margin-top:32px;display:flex;gap:28px;flex-wrap:wrap}
+.hero .meta div{border-left:2px solid var(--accent);padding-left:14px}
+.hero .meta .num{font-family:"Outfit",sans-serif;font-size:1.8rem;font-weight:600;line-height:1}
+.hero .meta .cap{font-size:.74rem;color:var(--sub);letter-spacing:.08em}
+
+/* ===== セクション共通 ===== */
+section{padding:72px 0}
+.sec-head{margin-bottom:48px}
+.sec-head .en{font-family:"Outfit",sans-serif;font-size:1.05rem;color:var(--gold);letter-spacing:.16em;display:block;margin-bottom:8px}
+.sec-head h2{font-family:"Zen Maru Gothic",sans-serif;font-size:1.9rem;font-weight:900;letter-spacing:.04em}
+.sec-head p{font-size:.92rem;color:var(--sub);margin-top:10px;max-width:600px}
+
+/* ===== 記事グリッド ===== */
+.articles{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:var(--line);border:1px solid var(--line)}
+.card{background:#fff;padding:40px 34px;transition:.3s;position:relative;display:flex;flex-direction:column}
+.card:hover{background:var(--bg)}
+.card .cat{font-size:.72rem;font-weight:500;color:var(--accent);letter-spacing:.1em;margin-bottom:14px;display:inline-block}
+.card h3{font-family:"Zen Maru Gothic",sans-serif;font-size:1.3rem;font-weight:700;line-height:1.6;margin-bottom:14px;letter-spacing:.02em}
+.card p{font-size:.88rem;color:var(--sub);line-height:1.95;flex-grow:1}
+.card .read{margin-top:22px;font-family:"Outfit",sans-serif;font-size:1rem;color:var(--gold);letter-spacing:.06em}
+.card .read::after{content:" →";transition:.2s}
+.card:hover .read::after{margin-left:6px}
+
+/* ===== 記事本文 ===== */
+.article-body{max-width:760px;margin:0 auto}
+.article-body article{margin-bottom:72px;padding-bottom:56px;border-bottom:1px solid var(--line)}
+.article-body article:last-child{border-bottom:none}
+.article-body .cat{font-size:.74rem;font-weight:500;color:var(--accent);letter-spacing:.1em}
+.article-body h2{font-family:"Zen Maru Gothic",sans-serif;font-size:1.7rem;font-weight:900;line-height:1.5;margin:12px 0 8px;letter-spacing:.02em}
+.article-body .date{font-family:"Outfit",sans-serif;color:var(--sub);font-size:.95rem;margin-bottom:28px}
+.article-body h3{font-family:"Zen Maru Gothic",sans-serif;font-size:1.2rem;font-weight:700;margin:36px 0 14px;padding-left:14px;border-left:3px solid var(--accent)}
+.article-body p{font-size:.94rem;line-height:2.05;margin-bottom:18px;color:#2b2622}
+.article-body ul{margin:0 0 22px 4px;list-style:none}
+.article-body ul li{font-size:.92rem;line-height:1.95;padding-left:24px;position:relative;margin-bottom:8px;color:#2b2622}
+.article-body ul li::before{content:"◆";position:absolute;left:0;color:var(--gold);font-size:.7rem;top:6px}
+.cta-btn{
+  display:inline-block;background:var(--accent);color:#fff;
+  font-weight:500;font-size:.92rem;padding:14px 32px;border-radius:2px;
+  margin:8px 0 4px;transition:.25s;letter-spacing:.04em;
+}
+.cta-btn:hover{background:#9a3149;transform:translateY(-2px)}
+.note{font-size:.78rem;color:var(--sub);margin-top:8px}
+.pr-tag{display:inline-block;font-size:.7rem;color:var(--sub);border:1px solid var(--line);padding:2px 10px;border-radius:2px;margin-bottom:10px;letter-spacing:.08em}
+
+/* ===== 運営者情報 ===== */
+.about{background:#fff;border-top:1px solid var(--line)}
+.about .box{display:grid;grid-template-columns:1fr 1.4fr;gap:48px;align-items:start}
+.about .box .sig{font-family:"Zen Maru Gothic",sans-serif;font-size:1.4rem;font-weight:800}
+.about dl{display:grid;grid-template-columns:auto 1fr;gap:10px 20px;font-size:.88rem}
+.about dt{color:var(--sub);font-weight:400}
+.about dd{color:var(--ink)}
+
+/* ===== フッター ===== */
+footer{background:var(--ink);color:#cbc3ba;padding:56px 0 32px}
+footer .top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px;margin-bottom:40px}
+footer .logo{color:#fff}
+footer .logo span{color:var(--accent)}
+footer .links{display:flex;gap:36px;flex-wrap:wrap}
+footer .links a{font-size:.84rem;color:#cbc3ba;transition:.2s}
+footer .links a:hover{color:#fff}
+footer .disclaimer{font-size:.74rem;color:#8a8078;line-height:1.9;border-top:1px solid #3a342f;padding-top:24px;max-width:760px}
+footer .copy{font-family:"Outfit",sans-serif;font-size:.9rem;color:#8a8078;margin-top:20px;letter-spacing:.08em}
+
+/* ===== アニメーション ===== */
+.fade-up{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* ===== レスポンシブ ===== */
+@media(max-width:768px){
+  nav ul{display:none}
+  .grid{grid-template-columns:1fr}
+  .about .box{grid-template-columns:1fr;gap:28px}
+  .hero{padding:64px 0 56px}
+  section{padding:56px 0}
+  footer .top{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- 年齢確認 -->
+<div id="age-gate">
+  <div class="box">
+    <p class="en">AGE VERIFICATION</p>
+    <h2>年齢確認</h2>
+    <p>当サイトは成人向けコンテンツに関する情報を含みます。<br>あなたは18歳以上ですか？</p>
+    <div class="btns">
+      <button class="yes" onclick="enter()">はい（18歳以上）</button>
+      <button class="no" onclick="location.href='https://www.google.com'">いいえ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ヘッダー -->
+<header>
+  <div class="wrap inner">
+    <div class="logo">コミ<span>恋</span></div>
+    <nav>
+      <ul>
+        <li><a href="#reviews">レビュー</a></li>
+        <li><a href="#articles">特集記事</a></li>
+        <li><a href="#about">運営者</a></li>
+        <li><a href="#footer">サイト情報</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ヒーロー -->
+<section class="hero">
+  <div class="wrap inner">
+    <p class="label">Comic Review Media</p>
+    <h1>読む前に、<em>その一冊</em>を<br>見極める。</h1>
+    <p>コミ恋は、大人向け電子コミックを厳選してレビューする情報メディアです。膨大な作品の中から本当に読む価値のある一冊を、ジャンル・あらすじ・読みどころの視点で丁寧にご紹介します。</p>
+    <div class="meta fade-up">
+      <div><div class="num">2万+</div><div class="cap">レビュー対象作品</div></div>
+      <div><div class="num">週2回</div><div class="cap">更新頻度</div></div>
+      <div><div class="num">100%</div><div class="cap">実読レビュー</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- レビュー一覧 -->
+<section class="articles" id="reviews">
+  <div class="wrap">
+    <div class="sec-head fade-up">
+      <span class="en">Latest Reviews</span>
+      <h2>新着レビュー・ガイド</h2>
+      <p>編集部が実際に読み込んだうえで、ネタバレを抑えつつ作品の魅力をお伝えします。</p>
+    </div>
+    <div class="grid">
+      <a href="#a1" class="card fade-up">
+        <span class="cat">ジャンルガイド</span>
+        <h3>はじめての大人向け電子コミック、ジャンル別おすすめの選び方</h3>
+        <p>ラブストーリー、ヒューマンドラマ、ファンタジーまで。膨大なジャンルの中から自分に合う一冊を見つけるための基準を、編集部の視点で整理しました。</p>
+        <span class="read">続きを読む</span>
+      </a>
+      <a href="#a2" class="card fade-up">
+        <span class="cat">お得ガイド</span>
+        <h3>電子コミックを賢く買う。セール・クーポンの活用術</h3>
+        <p>定期的に開催される大型セールやキャンペーン。タイミングと買い方を押さえるだけで、同じ作品をぐっとお得に楽しめます。失敗しない購入の流れを解説。</p>
+        <span class="read">続きを読む</span>
+      </a>
+      <a href="#a3" class="card fade-up">
+        <span class="cat">作品レビュー</span>
+        <h3>話題作を深掘り。今チェックしておきたい注目シリーズ</h3>
+        <p>口コミで評価が高い人気シリーズをピックアップ。世界観・キャラクター・読後感の3軸で、どんな読者に向いているかを丁寧にレビューします。</p>
+        <span class="read">続きを読む</span>
+      </a>
+      <a href="#a4" class="card fade-up">
+        <span class="cat">初心者ガイド</span>
+        <h3>電子書籍ストアの使い方完全ガイド｜登録から購入まで</h3>
+        <p>はじめて電子コミックストアを使う方向けに、アカウント登録から作品の探し方、購入、ダウンロードまでの流れをステップごとにわかりやすく解説します。</p>
+        <span class="read">続きを読む</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 記事本文 -->
+<section id="articles">
+  <div class="wrap article-body">
+    <div class="sec-head fade-up" style="text-align:center">
+      <span class="en">Featured Articles</span>
+      <h2>特集記事</h2>
+    </div>
+
+    <article id="a1" class="fade-up">
+      <span class="cat">ジャンルガイド</span>
+      <h2>はじめての大人向け電子コミック、ジャンル別おすすめの選び方</h2>
+      <p class="date">2026.05.31</p>
+      <p>電子コミックの世界はとにかく作品数が膨大です。いざ読んでみようと思っても、何から手をつければいいのか迷ってしまう方は少なくありません。そこでこの記事では、ジャンルごとの特徴と、自分に合う作品を見つけるための選び方のポイントを編集部の視点で整理しました。</p>
+      <h3>まずは「読後感」で選ぶ</h3>
+      <p>作品選びで失敗しないコツは、ジャンル名そのものより「読んだあとにどんな気持ちになりたいか」を起点にすることです。胸が締めつけられるような切ない物語が読みたいのか、それともスカッとする爽快なストーリーがいいのか。この軸を先に決めると、絞り込みが一気に楽になります。</p>
+      <h3>人気ジャンルの傾向</h3>
+      <ul>
+        <li>ラブストーリー系：感情の機微を丁寧に描く作品が多く、読みごたえ重視の方向け</li>
+        <li>ヒューマンドラマ系：登場人物の成長や関係性の変化を楽しみたい方に</li>
+        <li>ファンタジー・異世界系：現実を忘れて没入したいときにおすすめ</li>
+        <li>短編・オムニバス系：すきま時間にサクッと読み切りたい方に最適</li>
+      </ul>
+      <h3>迷ったらレビューと試し読みを活用</h3>
+      <p>多くの電子書籍ストアでは、購入前に冒頭部分の試し読みができます。レビュー評価と試し読みを組み合わせれば、自分の好みに合うかどうかをかなりの精度で判断できます。気になった作品はまず試し読みから始めてみましょう。</p>
+      <span class="pr-tag">PR</span><br>
+      <a href="AFFILIATE_ID_PLACEHOLDER" class="cta-btn" target="_blank" rel="nofollow noopener">作品を探してみる</a>
+      <p class="note">※ 当リンクから移動した先で購入された場合、当サイトに紹介料が支払われることがあります。</p>
+    </article>
+
+    <article id="a2" class="fade-up">
+      <span class="cat">お得ガイド</span>
+      <h2>電子コミックを賢く買う。セール・クーポンの活用術</h2>
+      <p class="date">2026.05.30</p>
+      <p>同じ作品でも、買うタイミングによって支払う金額は大きく変わります。電子書籍ストアでは定期的に大型セールやクーポン配布が行われており、これを知っているかどうかでコストパフォーマンスが段違いになります。</p>
+      <h3>大型セールのタイミングを押さえる</h3>
+      <p>多くのストアでは、月初・月末や季節の節目に合わせて大規模なセールを開催します。中には対象作品が大幅割引になるキャンペーンもあり、まとめ買いのチャンスです。気になる作品があるときは、すぐに買わず一度セール情報を確認する習慣をつけるとよいでしょう。</p>
+      <h3>クーポンと併用してさらにお得に</h3>
+      <ul>
+        <li>初回登録クーポン：新規登録時に配布される割引特典を見逃さない</li>
+        <li>ポイント還元：購入金額に応じたポイントを次回購入に充当</li>
+        <li>セール×クーポンの重ねがけ：割引が二重で効くケースもある</li>
+      </ul>
+      <h3>「欲しいものリスト」で買い時を逃さない</h3>
+      <p>気になる作品はお気に入り登録しておくと、セール対象になった際に通知を受け取れるストアもあります。読みたい作品をリスト化しておき、セールのタイミングでまとめて購入するのが最も賢い買い方です。</p>
+      <span class="pr-tag">PR</span><br>
+      <a href="AFFILIATE_ID_PLACEHOLDER" class="cta-btn" target="_blank" rel="nofollow noopener">セール情報をチェック</a>
+      <p class="note">※ 当リンクから移動した先で購入された場合、当サイトに紹介料が支払われることがあります。</p>
+    </article>
+
+    <article id="a3" class="fade-up">
+      <span class="cat">作品レビュー</span>
+      <h2>話題作を深掘り。今チェックしておきたい注目シリーズ</h2>
+      <p class="date">2026.05.29</p>
+      <p>口コミやランキングで継続的に高い評価を得ているシリーズには、それなりの理由があります。この記事では、編集部が「世界観」「キャラクター」「読後感」の3軸で注目シリーズを評価し、どんな読者に向いているかを整理します。</p>
+      <h3>評価のものさし</h3>
+      <ul>
+        <li>世界観：設定の作り込みと没入感の深さ</li>
+        <li>キャラクター：感情移入のしやすさ、関係性の描き方</li>
+        <li>読後感：読み終えたあとに残る満足度・余韻</li>
+      </ul>
+      <h3>長く愛される作品の共通点</h3>
+      <p>ロングセラーとなる作品には、単発の刺激ではなく「読み返したくなる深み」があります。登場人物の心情が丁寧に描かれ、ページをめくるたびに新しい発見があること。これがリピート読者を生む最大の要因です。レビューを参考にしつつ、自分の感性に響く一冊を探してみてください。</p>
+      <span class="pr-tag">PR</span><br>
+      <a href="AFFILIATE_ID_PLACEHOLDER" class="cta-btn" target="_blank" rel="nofollow noopener">注目作品を見る</a>
+      <p class="note">※ 当リンクから移動した先で購入された場合、当サイトに紹介料が支払われることがあります。</p>
+    </article>
+
+    <article id="a4" class="fade-up">
+      <span class="cat">初心者ガイド</span>
+      <h2>電子書籍ストアの使い方完全ガイド｜登録から購入まで</h2>
+      <p class="date">2026.05.28</p>
+      <p>はじめて電子コミックストアを使う方にとって、登録や購入の手順は意外とわかりにくいもの。この記事では、アカウント作成から作品の購入・閲覧までの流れを、ステップごとにわかりやすく解説します。</p>
+      <h3>ステップ1：アカウント登録</h3>
+      <p>メールアドレスを登録し、年齢確認を済ませればアカウントの準備は完了です。多くのストアは無料で登録でき、登録時に使えるクーポンが配布されることもあります。</p>
+      <h3>ステップ2：作品を探す</h3>
+      <p>ジャンル・ランキング・キーワード検索など、複数の探し方があります。気になる作品は試し読みで雰囲気を確認してから購入を検討しましょう。</p>
+      <h3>ステップ3：購入と閲覧</h3>
+      <ul>
+        <li>購入：クレジットカードや各種決済に対応。ポイント購入も可能</li>
+        <li>閲覧：ブラウザや専用アプリでいつでも読める</li>
+        <li>保管：購入済み作品は本棚に保管され、再ダウンロードも可能</li>
+      </ul>
+      <p>一度流れを覚えてしまえば、あとは直感的に使えます。まずは無料登録から始めて、試し読みで自分に合う作品を探してみるのがおすすめです。</p>
+      <span class="pr-tag">PR</span><br>
+      <a href="AFFILIATE_ID_PLACEHOLDER" class="cta-btn" target="_blank" rel="nofollow noopener">無料で登録してみる</a>
+      <p class="note">※ 当リンクから移動した先で購入された場合、当サイトに紹介料が支払われることがあります。</p>
+    </article>
+  </div>
+</section>
+
+<!-- 運営者情報 -->
+<section class="about" id="about">
+  <div class="wrap">
+    <div class="sec-head fade-up">
+      <span class="en">About Us</span>
+      <h2>運営者情報</h2>
+    </div>
+    <div class="box fade-up">
+      <div>
+        <p class="sig">コミ恋 編集部</p>
+        <p style="font-size:.88rem;color:var(--sub);margin-top:12px">「読む前に、その一冊を見極める」をコンセプトに、大人向け電子コミックの実読レビューと購入ガイドをお届けする情報メディアです。読者が後悔のない選択をできるよう、中立的で丁寧な情報発信を心がけています。</p>
+      </div>
+      <dl>
+        <dt>サイト名</dt><dd>コミ恋（こみこい）</dd>
+        <dt>運営</dt><dd>コミ恋 編集部</dd>
+        <dt>設立</dt><dd>2026年5月</dd>
+        <dt>掲載内容</dt><dd>大人向け電子コミックのレビュー・購入ガイド</dd>
+        <dt>対象年齢</dt><dd>18歳以上</dd>
+        <dt>お問い合わせ</dt><dd>info@（※公開時に設定）</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- フッター -->
+<footer id="footer">
+  <div class="wrap">
+    <div class="top">
+      <div class="logo">コミ<span>恋</span></div>
+      <div class="links">
+        <a href="#reviews">レビュー</a>
+        <a href="#articles">特集記事</a>
+        <a href="#about">運営者情報</a>
+        <a href="#footer">免責事項</a>
+      </div>
+    </div>
+    <p class="disclaimer">
+      当サイトは18歳以上の方を対象とした、大人向け電子コミックのレビュー・情報提供メディアです。当サイトはアフィリエイトプログラムを利用しており、掲載リンクを経由して商品が購入された場合、運営者に紹介料が支払われることがあります。掲載情報は可能な限り正確を期していますが、価格・セール内容・配信状況は変更される場合があります。最新かつ正確な情報は各販売元の公式ページをご確認ください。当サイトに掲載されている作品のタイトル・画像等の著作権は、各権利者に帰属します。
+    </p>
+    <p class="copy">© 2026 コミ恋 — Comic Review Media</p>
+  </div>
+</footer>
+
+<script>
+// 年齢確認
+function enter(){
+  document.getElementById('age-gate').style.display='none';
+}
+// 既に確認済みなら出さない（同一セッション内）
+(function(){
+  try{
+    if(window.name==='komikoi_verified'){
+      document.getElementById('age-gate').style.display='none';
+    }
+  }catch(e){}
+})();
+document.querySelector('#age-gate .yes').addEventListener('click',function(){
+  try{window.name='komikoi_verified';}catch(e){}
+});
+
+// スクロールアニメーション
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.12});
+document.querySelectorAll('.fade-up').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
