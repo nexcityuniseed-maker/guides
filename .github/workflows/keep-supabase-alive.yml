@@ -1,0 +1,33 @@
+name: Keep Supabase Alive
+
+# Supabase無料プランの自動一時停止(1週間アクセスなしで停止)を防ぐため、
+# 毎日定刻にSupabase REST APIを叩いてアクセス記録を残す。
+# 応募者の実回答送信もアクセスとしてカウントされるが、応募が少ない時期の保険として動作。
+
+on:
+  schedule:
+    # 毎日 03:00 UTC (= 12:00 JST) に実行
+    - cron: '0 3 * * *'
+  # 必要な時に手動でも実行可能
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping Supabase responses table
+        run: |
+          STATUS=$(curl -s -o /tmp/body -w "%{http_code}" \
+            "https://fbzfozjdctbzrhjztlsk.supabase.co/rest/v1/responses?select=id&limit=1" \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZiemZvempkY3RienJoanp0bHNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NjM0OTIsImV4cCI6MjA5MzAzOTQ5Mn0.mkgVTERa4vHs40YZmzupl9bclX1tf5zeSlWbtjY_rZo")
+          echo "HTTP Status: $STATUS"
+          cat /tmp/body
+          # 200 (OK) または 401/403 (RLS弾き) のいずれでもDBには到達しているのでOK
+          if [ "$STATUS" = "200" ] || [ "$STATUS" = "401" ] || [ "$STATUS" = "403" ]; then
+            echo "✓ Supabase is alive and responding"
+            exit 0
+          else
+            echo "✗ Unexpected status code"
+            exit 1
+          fi
