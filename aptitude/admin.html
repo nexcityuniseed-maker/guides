@@ -889,12 +889,10 @@ function generatePattern(prefs, lieRate, timeBaseMs, episodes) {
 }
 
 // ========== パスワード認証 + 初期化 ==========
-// 二層認証: ユーザーは「ADMIN_PASSWORD」を入力する。
-// 一致した場合のみ、内部的にSupabase Authで本物のパスワードを送信する。
-// これによりSupabase側を触らずに表示用パスワードを変更できる。
-const ADMIN_EMAIL = 'admin@eyemor.app';
-const SUPABASE_PASSWORD = 'bwcesn123'; // Supabaseに登録済みの本物のパスワード(変更不要)
-const ADMIN_PASSWORD = '1234';      // ← ユーザーが入力するパスワード
+// シンプルなパスワードゲート方式。Supabase Authは使わずanonロールで読み書き。
+// パスワード変更はこの定数を書き換えるだけ。
+const ADMIN_PASSWORD = '1234';
+const SESSION_KEY = 'aptitude_admin_authed';
 
 function showLogin() {
   document.getElementById('loginOverlay').classList.add('active');
@@ -903,7 +901,11 @@ function showLogin() {
 }
 function hideLogin() {
   document.getElementById('loginOverlay').classList.remove('active');
-  document.getElementById('logoutBtn').style.display = Storage.isCloud ? 'block' : 'none';
+  document.getElementById('logoutBtn').style.display = 'block';
+}
+
+function isAuthed() {
+  return sessionStorage.getItem(SESSION_KEY) === '1';
 }
 
 async function handleLogin() {
@@ -924,12 +926,12 @@ async function handleLogin() {
   btn.disabled = true;
   btn.textContent = 'ログイン中...';
   try {
-    await Auth.signIn(ADMIN_EMAIL, SUPABASE_PASSWORD);
+    sessionStorage.setItem(SESSION_KEY, '1');
     document.getElementById('loginPassword').value = '';
     hideLogin();
     await refreshAndRender();
   } catch (e) {
-    errEl.textContent = 'ログインに失敗しました';
+    errEl.textContent = 'データ取得に失敗しました: ' + (e.message || e);
     errEl.classList.add('show');
   } finally {
     btn.disabled = false;
@@ -937,34 +939,20 @@ async function handleLogin() {
   }
 }
 
-async function handleLogout() {
+function handleLogout() {
   if (!confirm('ログアウトしますか？')) return;
-  await Auth.signOut();
+  sessionStorage.removeItem(SESSION_KEY);
   currentList = [];
   showLogin();
 }
 
 async function init() {
   Storage.init();
-  if (Storage.isCloud) {
-    const session = await Auth.getSession();
-    if (session) {
-      hideLogin();
-      await refreshAndRender();
-    } else {
-      showLogin();
-    }
-    Auth.onChange(async (sess) => {
-      if (sess) {
-        hideLogin();
-        await refreshAndRender();
-      } else {
-        showLogin();
-      }
-    });
-  } else {
+  if (isAuthed()) {
     hideLogin();
     await refreshAndRender();
+  } else {
+    showLogin();
   }
 }
 
