@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ドロポンの教科書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f1ea;
+  --paper:#ffffff;
+  --ink:#1a1a1a;
+  --ink-soft:#5a5248;
+  --ink-faint:#8a7f72;
+  --accent:#ff5b3a;
+  --accent-deep:#d63c1c;
+  --accent-wash:#fff0ec;
+  --staff:#22366e;
+  --staff-wash:#eef1f9;
+  --gold:#b8923f;
+  --ok:#0e7f5c;
+  --line:rgba(26,26,26,0.12);
+  --line-soft:rgba(26,26,26,0.07);
+  --shadow:0 1px 2px rgba(26,26,26,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#191614;
+    --paper:#221e1b;
+    --ink:#f3ece3;
+    --ink-soft:#c3b8a9;
+    --ink-faint:#94897b;
+    --accent:#ff7454;
+    --accent-deep:#ffa389;
+    --accent-wash:#3a231c;
+    --staff:#9fb4e8;
+    --staff-wash:#1e2436;
+    --gold:#d9b263;
+    --ok:#4dbf98;
+    --line:rgba(243,236,227,0.16);
+    --line-soft:rgba(243,236,227,0.09);
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#191614;
+  --paper:#221e1b;
+  --ink:#f3ece3;
+  --ink-soft:#c3b8a9;
+  --ink-faint:#94897b;
+  --accent:#ff7454;
+  --accent-deep:#ffa389;
+  --accent-wash:#3a231c;
+  --staff:#9fb4e8;
+  --staff-wash:#1e2436;
+  --gold:#d9b263;
+  --ok:#4dbf98;
+  --line:rgba(243,236,227,0.16);
+  --line-soft:rgba(243,236,227,0.09);
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans JP',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.85;
+  font-feature-settings:"palt";
+  -webkit-font-smoothing:antialiased;
+  font-size:16px;
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 96px}
+
+/* ---------- header ---------- */
+header{padding:56px 0 28px}
+.eyebrow{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.72rem;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent);
+}
+h1{
+  font-size:clamp(2.1rem,9vw,3.1rem);font-weight:900;line-height:1.18;
+  letter-spacing:-.02em;margin-top:10px;text-wrap:balance;
+}
+.lede{margin-top:14px;font-size:1.02rem;color:var(--ink-soft);max-width:36em}
+.hero-meta{
+  margin-top:22px;display:flex;flex-wrap:wrap;gap:8px 18px;
+  font-size:.8rem;color:var(--ink-faint);
+  font-family:'Space Grotesk',sans-serif;letter-spacing:.04em;
+}
+
+/* ---------- 3秒 ---------- */
+.tldr{
+  margin-top:30px;background:var(--paper);border:2px solid var(--accent);
+  border-radius:14px;padding:22px 22px 24px;box-shadow:var(--shadow);
+}
+.tldr .tag{
+  display:inline-block;background:var(--accent);color:#fff;
+  font-size:.72rem;font-weight:700;letter-spacing:.12em;
+  padding:3px 10px;border-radius:999px;
+}
+.tldr p{margin-top:12px;font-size:1.18rem;font-weight:700;line-height:1.7}
+.tldr p .hl{color:var(--accent-deep)}
+.tldr .after{margin-top:8px;font-size:.92rem;font-weight:400;color:var(--ink-soft)}
+
+/* ---------- nav ---------- */
+nav{
+  position:sticky;top:0;z-index:20;margin-top:34px;
+  background:var(--bg);
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line-soft);
+  margin-left:-20px;margin-right:-20px;padding:10px 20px;
+}
+.nav-in{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.nav-in::-webkit-scrollbar{display:none}
+nav a{
+  flex:0 0 auto;text-decoration:none;color:var(--ink-soft);
+  font-size:.82rem;font-weight:700;padding:6px 12px;border-radius:999px;
+  border:1px solid var(--line);background:var(--paper);white-space:nowrap;
+}
+nav a:hover{border-color:var(--accent);color:var(--accent-deep)}
+nav a:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px
+}
+
+/* ---------- sections ---------- */
+section{padding-top:56px}
+.sec-head{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:10px}
+.sec-num{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;
+  color:var(--accent);letter-spacing:.06em;flex:0 0 auto;
+}
+h2{font-size:clamp(1.35rem,5.5vw,1.75rem);font-weight:900;letter-spacing:-.01em;line-height:1.4}
+.sec-sub{margin-top:12px;color:var(--ink-soft);font-size:.95rem}
+h3{
+  font-size:1.06rem;font-weight:900;margin-top:34px;
+  display:flex;align-items:center;gap:9px;line-height:1.5;
+}
+h3::before{content:"";width:5px;height:1.05em;background:var(--accent);border-radius:2px;flex:0 0 auto}
+h4{font-size:.95rem;font-weight:700;margin-top:20px}
+p+p{margin-top:12px}
+.small{font-size:.85rem;color:var(--ink-faint);line-height:1.75}
+
+/* ---------- 3つの仕事 ---------- */
+.jobs{display:grid;gap:12px;margin-top:22px}
+@media(min-width:620px){.jobs{grid-template-columns:repeat(3,1fr)}}
+.job{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;
+  padding:18px;box-shadow:var(--shadow);
+}
+.job:hover{border-color:var(--accent)}
+.job .n{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;color:var(--accent);line-height:1}
+.job .t{font-weight:900;font-size:1.05rem;margin-top:6px}
+.job .d{font-size:.85rem;color:var(--ink-soft);margin-top:4px;line-height:1.7}
+
+/* ---------- flow (お客様の流れ) ---------- */
+.flow{display:grid;gap:10px;margin-top:22px;counter-reset:f}
+@media(min-width:620px){.flow{grid-template-columns:repeat(2,1fr)}}
+.flow li{
+  list-style:none;background:var(--paper);border:1px solid var(--line);
+  border-radius:12px;padding:14px 16px 15px;display:flex;gap:13px;align-items:flex-start;
+}
+.flow li::before{
+  counter-increment:f;content:counter(f);
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;
+  background:var(--ink);color:var(--bg);width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;flex:0 0 auto;margin-top:3px;
+}
+.flow li>div>b{display:block;font-size:.98rem}
+.flow li>div>span{display:block;font-size:.85rem;color:var(--ink-soft);line-height:1.7}
+.flow li>div>span b{font-weight:700;color:var(--ink)}
+
+/* ---------- POP ---------- */
+.pop{margin-top:22px}
+.pop img{
+  display:block;width:100%;max-width:420px;height:auto;margin:0 auto;
+  border-radius:12px;border:1px solid var(--line);box-shadow:0 6px 24px rgba(26,26,26,.13);
+}
+.pop .cap{
+  margin-top:10px;text-align:center;font-size:.82rem;color:var(--ink-faint);
+}
+
+/* ---------- セリフ ---------- */
+.script{
+  background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--gold);
+  border-radius:0 12px 12px 0;padding:16px 18px;margin-top:14px;
+}
+.script .when{
+  font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;
+  color:var(--gold);letter-spacing:.02em;
+}
+.script .line{font-size:1.02rem;font-weight:500;margin-top:6px;line-height:1.85}
+.script .line::before{content:"「"}
+.script .line::after{content:"」"}
+.script .why{font-size:.82rem;color:var(--ink-faint);margin-top:8px}
+
+/* ---------- steps (引き換え) ---------- */
+.steps{margin-top:24px;display:grid;gap:0}
+.step{
+  position:relative;padding:0 0 22px 46px;
+}
+.step:not(:last-child)::after{
+  content:"";position:absolute;left:15px;top:34px;bottom:0;width:2px;
+  background:var(--line);
+}
+.step .badge{
+  position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;
+  display:grid;place-items:center;font-family:'Space Grotesk',sans-serif;
+  font-weight:700;font-size:.95rem;color:#fff;
+}
+.step.cust .badge{background:var(--accent)}
+.step.staff .badge{background:var(--staff)}
+.step .who{
+  font-size:.7rem;font-weight:700;letter-spacing:.1em;padding:2px 8px;
+  border-radius:999px;display:inline-block;
+}
+.step.cust .who{background:var(--accent-wash);color:var(--accent-deep)}
+.step.staff .who{background:var(--staff-wash);color:var(--staff)}
+.step .what{font-size:1.08rem;font-weight:900;margin-top:6px;line-height:1.55}
+.step .detail{font-size:.9rem;color:var(--ink-soft);margin-top:4px}
+.legend{display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:18px;font-size:.85rem}
+.legend i{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:6px}
+.legend .c i{background:var(--accent)}
+.legend .s i{background:var(--staff)}
+
+/* ---------- warn / note ---------- */
+.warn{
+  background:var(--accent-wash);border:1px solid var(--accent);border-radius:12px;
+  padding:18px 20px;margin-top:24px;
+}
+.warn .h{font-weight:900;color:var(--accent-deep);font-size:1.02rem;display:flex;gap:8px;align-items:baseline}
+.warn .h span{font-family:'Space Grotesk',sans-serif;font-size:1.1rem}
+.warn p{font-size:.92rem;margin-top:8px;line-height:1.8}
+.note{
+  background:var(--paper);border:1px dashed var(--line);border-radius:12px;
+  padding:16px 18px;margin-top:20px;font-size:.88rem;color:var(--ink-soft);
+}
+.note b{color:var(--ink)}
+
+/* ---------- ban list ---------- */
+.bans{margin-top:20px;display:grid;gap:10px}
+.ban{
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;
+  padding:15px 17px;display:grid;gap:6px;
+}
+.ban .x{
+  font-weight:900;font-size:1rem;line-height:1.6;display:flex;gap:9px;align-items:flex-start;
+}
+.ban .x::before{
+  content:"×";color:#fff;background:var(--accent-deep);width:22px;height:22px;
+  border-radius:50%;display:grid;place-items:center;font-size:.85rem;flex:0 0 auto;margin-top:4px;
+  font-family:'Space Grotesk',sans-serif;
+}
+.ban .r{font-size:.86rem;color:var(--ink-soft);padding-left:31px}
+.ban .r b{color:var(--ink)}
+
+/* ---------- table ---------- */
+.tbl-wrap{overflow-x:auto;margin-top:20px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:.9rem}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line-soft)}
+thead th{
+  background:var(--ink);color:var(--bg);font-size:.78rem;letter-spacing:.06em;font-weight:700;
+}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-family:'Space Grotesk',sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rank{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--accent);white-space:nowrap}
+
+/* ---------- money ---------- */
+.money{display:grid;gap:10px;margin-top:22px}
+@media(min-width:620px){.money{grid-template-columns:repeat(2,1fr)}}
+.m-row{
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+}
+.m-row .k{font-size:.88rem;color:var(--ink-soft)}
+.m-row .v{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.15rem;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.total{
+  margin-top:12px;background:var(--ink);color:var(--bg);border-radius:12px;
+  padding:20px 22px;display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;
+}
+.total .k{font-weight:700;font-size:.95rem}
+.total .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.9rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.total .v small{font-size:.85rem;font-weight:500;opacity:.75;margin-left:6px}
+
+/* ---------- kv (店長向け) ---------- */
+.kv{margin-top:18px;border-top:1px solid var(--line);}
+.kv div{display:grid;gap:2px;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+@media(min-width:620px){.kv div{grid-template-columns:170px 1fr;gap:16px;align-items:baseline}}
+.kv dt,.kv .k{font-size:.83rem;font-weight:700;color:var(--ink-faint);letter-spacing:.02em}
+.kv .v{font-size:.94rem}
+.kv a{color:var(--accent-deep);text-decoration:none;border-bottom:1px solid currentColor;word-break:break-all}
+
+/* ---------- checklist ---------- */
+.check{margin-top:22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:6px 18px}
+.check label{
+  display:flex;gap:12px;align-items:flex-start;padding:13px 0;
+  border-bottom:1px solid var(--line-soft);cursor:pointer;font-size:.95rem;line-height:1.65;
+}
+.check label:last-child{border-bottom:none}
+.check input{
+  appearance:none;-webkit-appearance:none;width:22px;height:22px;flex:0 0 auto;margin-top:2px;
+  border:2px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;
+  display:grid;place-items:center;
+}
+.check input:checked{background:var(--ok);border-color:var(--ok)}
+.check input:checked::after{content:"✓";color:#fff;font-size:.85rem;font-weight:700;line-height:1}
+.check input:checked+span{color:var(--ink-faint);text-decoration:line-through}
+
+/* ---------- footer ---------- */
+footer{
+  margin-top:64px;padding-top:26px;border-top:2px solid var(--ink);
+  font-size:.85rem;color:var(--ink-faint);
+}
+footer b{color:var(--ink)}
+footer .src{margin-top:10px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">eye mor. staff / dropon</div>
+  <h1>ドロポンの教科書</h1>
+  <p class="lede">お店に入った「ガチャ」のしくみと、スタッフがやることを全部ここにまとめました。むずかしい話はナシ。読む順番も上から順でOKです。</p>
+  <div class="hero-meta">
+    <span>ドロポン営業資料＋サポートマニュアルを再構成</span>
+    <span>読了 約7分</span>
+  </div>
+
+  <div class="tldr">
+    <span class="tag">3秒でいうと</span>
+    <p>お客様がスマホで<span class="hl">ガチャを回す</span>。当たった景品を<span class="hl">うちが渡す</span>。以上。</p>
+    <p class="after">うちのガチャは<b>1回500円・ハズレなし（必ず500円分以上の特典）</b>。スタッフの仕事は「声をかける」と「景品を渡す」の2つだけで、むずかしい機械の操作はありません。</p>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-in">
+    <a href="#zentai">全体像</a>
+    <a href="#shigoto">3つの仕事</a>
+    <a href="#koekake">①声かけ</a>
+    <a href="#hikikae">②引き換え</a>
+    <a href="#kinshi">③禁止事項</a>
+    <a href="#keihin">景品の中身</a>
+    <a href="#mouke">なぜ儲かる</a>
+    <a href="#tencho">店長向け</a>
+    <a href="#komatta">困った時</a>
+  </div>
+</nav>
+
+<!-- 全体像 -->
+<section id="zentai">
+  <div class="sec-head"><span class="sec-num">01</span><h2>まず全体像。お客様はこう動く</h2></div>
+  <p class="sec-sub">ドロポンは、お客様のスマホの中で回るガチャです。専用の機械もカプセルもありません。当たるのは「うちのサービスの無料券・割引券」です。</p>
+
+  <ol class="flow">
+    <li><div><b>卓上POPのQRを読む</b><span>お客様が自分のスマホのカメラで読み取ります。アプリのダウンロードは不要。</span></div></li>
+    <li><div><b>会員登録してコインを買う</b><span>初回だけ会員登録。そのあとガチャ用のコインを購入します（お客様がスマホで決済）。</span></div></li>
+    <li><div><b>ガチャを回す</b><span>買ったコインでうちのガチャを回します。1等〜5等が入っています。</span></div></li>
+    <li><div><b>当たりが出る</b><span>「ドロップ」という引換券がスマホの中に入ります。景品名と有効期限が表示されます。</span></div></li>
+    <li><div><b>その場で、または次回来店時に引き換え</b><span>当日その場で使ってもOK。次回来店時に使ってもOK。ここでスタッフが登場します。</span></div></li>
+  </ol>
+
+  <div class="note">
+    <b>お店にお金が入るしくみ。</b>ガチャ売上のうち<b>80%がお店</b>、20%がドロポンの手数料です。たとえば500円のガチャが1回回れば、400円がお店の売上。ガチャが回らなかった月は手数料もゼロです。
+  </div>
+</section>
+
+<!-- 3つの仕事 -->
+<section id="shigoto">
+  <div class="sec-head"><span class="sec-num">02</span><h2>スタッフがやることは3つだけ</h2></div>
+  <p class="sec-sub">この3つを覚えたら、もう戦力です。タップすると各章に飛びます。</p>
+  <div class="jobs">
+    <a class="job" href="#koekake"><div class="n">1</div><div class="t">声をかける</div><div class="d">QRを置いただけでは誰も気づきません。ひと言添えるだけで回ります。</div></a>
+    <a class="job" href="#hikikae"><div class="n">2</div><div class="t">景品を渡す</div><div class="d">「使用済み」にしてから渡す。ここだけ絶対に守ります。</div></a>
+    <a class="job" href="#kinshi"><div class="n">3</div><div class="t">ルールを守る</div><div class="d">やってはいけないことが8個あります。知らずにやると契約解除もあります。</div></a>
+  </div>
+</section>
+
+<!-- ①声かけ -->
+<section id="koekake">
+  <div class="sec-head"><span class="sec-num">03</span><h2>① 声をかける</h2></div>
+  <p class="sec-sub">マニュアルにもハッキリ書かれています。「QRコードを設置しても、お客様に気づいていただかなければ効果は出ません」。つまり、声かけがゼロだとガチャはゼロです。</p>
+
+  <h3>そのまま使えるセリフ</h3>
+  <p class="small">店内POPの内容（1回500円・ハズレなし）に合わせたセリフです。丸暗記でOK。</p>
+
+  <div class="script">
+    <div class="when">1. カウンセリング・受付のとき</div>
+    <div class="line">いま、1回500円のガチャやってるんです。1等はReFaのヘアドライヤー、2等は今日の施術代が無料になります。しかもハズレなしで、いちばん下でも500円の無料券がもらえるので、よかったら回してみてください</div>
+    <div class="why">ポイント：<b>「ハズレなし・必ず500円分以上」</b>を必ず言う。これが一番回る理由です。500円払って500円以上返ってくるので、お客様は損をしません。</div>
+  </div>
+
+  <div class="script">
+    <div class="when">2. 施術に入る前・待ち時間</div>
+    <div class="line">そこのQRコード読み取るだけで回せますよ。1分もかからないです</div>
+    <div class="why">ポイント：手間がかからないことを伝える。待ち時間はいちばん回りやすい時間帯です。</div>
+  </div>
+
+  <div class="script">
+    <div class="when">3. お会計・お見送りのとき</div>
+    <div class="line">当たった券、次回いらしたときに使えるので忘れずに持ってきてくださいね</div>
+    <div class="why">ポイント：これが再来店の予約になります。券には有効期限があるので、ひと言リマインドが効きます。</div>
+  </div>
+
+  <h3>お店の中でできる告知</h3>
+  <ol class="flow">
+    <li><div><b>入口に加盟店ステッカー</b><span>入る前から「ここガチャあるんだ」と分かる状態にします。</span></div></li>
+    <li><div><b>卓上POPは目に留まる場所へ</b><span>受付横・待合・施術ベッドのそば。メニューや物で隠れる場所はNG。</span></div></li>
+    <li><div><b>ポスターを貼る</b><span>お客様の視線に入る位置に。素材は管理画面からダウンロードできます。</span></div></li>
+    <li><div><b>SNSで告知</b><span>Instagram・X・LINE公式で「ドロポン始めました」。<b>#ドロポン</b> <b>#ガチャ</b> を付けて、お客様の投稿も促します。Googleマップのビジネスプロフィールの投稿機能も使えます。</span></div></li>
+  </ol>
+</section>
+
+<!-- ②引き換え -->
+<section id="hikikae">
+  <div class="sec-head"><span class="sec-num">04</span><h2>② 景品を渡す（最重要）</h2></div>
+  <p class="sec-sub">この章だけは丸暗記してください。4ステップです。<b>紺色＝スタッフがやること</b>、<b>朱色＝お客様が自分でやること</b>。ほとんどお客様の操作なので、スタッフは見て確認するだけです。</p>
+
+  <div class="legend">
+    <span class="c"><i></i>お客様が自分で操作する</span>
+    <span class="s"><i></i>スタッフが確認・提供する</span>
+  </div>
+
+  <div class="steps">
+    <div class="step cust">
+      <div class="badge">1</div>
+      <span class="who">お客様</span>
+      <div class="what">スマホの「ドロップ一覧」を見せてもらう</div>
+      <div class="detail">当選画面に<b>景品名</b>と<b>有効期限</b>が出ています。まずここを確認。うちの店の引換券かどうかも一緒に見ます。</div>
+    </div>
+    <div class="step cust">
+      <div class="badge">2</div>
+      <span class="who">お客様</span>
+      <div class="what">「ドロップを利用する」ボタンをお客様がタップ</div>
+      <div class="detail">スタッフが代わりに押さない。お客様の画面を、お客様自身にタップしてもらいます。</div>
+    </div>
+    <div class="step staff">
+      <div class="badge">3</div>
+      <span class="who">スタッフ</span>
+      <div class="what">卓上POPの店舗QRコードを、お客様に読み取ってもらう</div>
+      <div class="detail">スライド操作のあと、自動でQR読み取り画面に切り替わります。お店のQRを読み取ってもらってください。これが「うちで使った」という証明になります。</div>
+    </div>
+    <div class="step staff">
+      <div class="badge">4</div>
+      <span class="who">スタッフ</span>
+      <div class="what">「使用済み」の画面を見てから、景品を提供</div>
+      <div class="detail">画面が「使用済み」になったことを目で確認 → そこで初めて景品（施術・無料券の適用など）を提供します。</div>
+    </div>
+  </div>
+
+  <div class="warn">
+    <div class="h"><span>!</span>渡す前に「使用済み」を必ず目で見る</div>
+    <p>QRを読み取らずに景品を渡すと、引換券がお客様のスマホに残ったままになります。その券はもう一度使えてしまうので、<b>同じ景品を二重に出してしまう</b>ことになります。忙しくても、ここだけは省略しません。</p>
+  </div>
+
+  <div class="note">
+    <b>当日でも次回でもOK。</b>当たったその場で交換してもいいし、後日の来店時に交換してもかまいません。ただし<b>有効期限</b>があります。期限切れの券は使えないので、画面の日付を必ず見てください。
+  </div>
+
+  <h3>覚えたかチェック</h3>
+  <p class="small">スマホごとに保存されます。新しく入ったスタッフに読んでもらうときにも使ってください。</p>
+  <div class="check" id="check">
+    <label><input type="checkbox" data-k="c1"><span>ガチャはお客様のスマホの中で回る（お店に機械はない）と説明できる</span></label>
+    <label><input type="checkbox" data-k="c2"><span>「ハズレでも次回使える券が入っている」を声かけに入れられる</span></label>
+    <label><input type="checkbox" data-k="c3"><span>引き換えは「一覧を見せてもらう→お客様がボタンを押す→店舗QRを読み取ってもらう→使用済みを確認して渡す」の順で言える</span></label>
+    <label><input type="checkbox" data-k="c4"><span>「使用済み」を確認する前に景品を渡してはいけない理由を説明できる</span></label>
+    <label><input type="checkbox" data-k="c5"><span>景品に現金・商品券・他店の割引券を使ってはいけないと知っている</span></label>
+    <label><input type="checkbox" data-k="c6"><span>自分でガチャを回して利益を取る行為（自作自演）は禁止だと知っている</span></label>
+  </div>
+</section>
+
+<!-- ③禁止事項 -->
+<section id="kinshi">
+  <div class="sec-head"><span class="sec-num">05</span><h2>③ やってはいけないこと</h2></div>
+  <p class="sec-sub">ここに書いてあることをやると、<b>アカウント停止・契約解除</b>になる場合があります。法律（景品表示法・賭博法など）に関わる話なので、良かれと思ってやったサービスがNGになることもあります。迷ったら店長かドロポンに確認してください。</p>
+
+  <h3>景品の中身についての禁止</h3>
+  <div class="bans">
+    <div class="ban">
+      <div class="x">現金・商品券・プリペイドカードを景品にする</div>
+      <div class="r"><b>理由：</b>景品表示法の観点から禁止。景品は「トリートメント無料券」のような<b>サービスの内容</b>にします。</div>
+    </div>
+    <div class="ban">
+      <div class="x">他社サービスや競合店の割引券・無料券を景品にする</div>
+      <div class="r"><b>理由：</b>商標権・競業避止の観点から禁止。<b>自店のサービスだけ</b>にしてください。</div>
+    </div>
+    <div class="ban">
+      <div class="x">何が当たるか見せずにQRを出す</div>
+      <div class="r"><b>理由：</b>消費者保護の観点から、提供する景品の概要は先に明示する必要があります。「回してみないと分からない」はNG。</div>
+    </div>
+    <div class="ban">
+      <div class="x">設定した景品と違うものを渡す</div>
+      <div class="r"><b>理由：</b>景品は必ず店舗で提供できる状態を保つ必要があります。<b>在庫切れ・提供不可を起こさない</b>こと。用意できなくなったら、渡す前に店長へ。</div>
+    </div>
+    <div class="ban">
+      <div class="x">最下位賞（5等）をガチャ1回分の金額以下にする</div>
+      <div class="r"><b>理由：</b>賭博法の観点から、最低景品は<b>ガチャ1回分以上の価値</b>が必要です。だから5等は「回した金額と同額の割引券」になっています。</div>
+    </div>
+  </div>
+
+  <h3>システムの使い方についての禁止</h3>
+  <div class="bans">
+    <div class="ban">
+      <div class="x">自店のQRコードを他店や他業者に貸す・譲る</div>
+      <div class="r"><b>理由：</b>QRコードは契約店舗専用です。転貸・譲渡は禁止されています。</div>
+    </div>
+    <div class="ban">
+      <div class="x">当選確率をこっそり操作してお客様に誤解させる</div>
+      <div class="r"><b>理由：</b>表示された確率と実態がズレていると、景品表示法に該当する可能性があります。</div>
+    </div>
+    <div class="ban">
+      <div class="x">不正利用（自作自演でガチャを回して利益を取る）</div>
+      <div class="r"><b>理由：</b>発覚した場合、直ちにサービス停止措置となることがあります。</div>
+    </div>
+  </div>
+
+  <h3>もし違反を指摘されたら</h3>
+  <ol class="flow">
+    <li><div><b>ドロポンから連絡が来る</b><span>メールまたは電話で、違反の可能性について連絡があります。</span></div></li>
+    <li><div><b>7日以内に対応</b><span>改善報告、または事実確認の返答をします。放置がいちばん危険です。</span></div></li>
+    <li><div><b>改善がないとアカウント停止</b><span>一時停止、または契約解除の措置になる場合があります。</span></div></li>
+  </ol>
+</section>
+
+<!-- 景品 -->
+<section id="keihin">
+  <div class="sec-head"><span class="sec-num">06</span><h2>景品の中身（うちのガチャ）</h2></div>
+  <p class="sec-sub">これが店内POPに出ている、うちの実際の景品です。<b>1回500円・ハズレなし・必ず500円分以上</b>。この3つだけ覚えれば案内できます。</p>
+
+  <div class="pop">
+    <img src="gacha-pop.jpg" alt="mor group ガチャ景品POP：1回500円、必ず500円分以上の特典がもらえる。1等 ReFaヘアドライヤー、2等 今日の施術代金無料（上限10,000円）、3等 コーティング無料券、4等 次回使える1,000円券、5等 500円無料券" width="720" height="1019">
+    <p class="cap">店内に貼ってあるPOP。お客様に見せながら案内するのが一番はやいです。</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>等級</th><th>景品</th><th>スタッフの対応</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="rank">1等</td><td><b>ReFa ヘアドライヤー</b></td><td>現物を渡す（在庫と保管場所を店長に確認）</td></tr>
+        <tr><td class="rank">2等</td><td><b>今日の施術代金 無料</b>（上限10,000円）</td><td>その日のお会計で値引き。10,000円を超えた分はお支払いいただく</td></tr>
+        <tr><td class="rank">3等</td><td><b>コーティング無料券</b></td><td>当日その場で施術、または次回来店時に施術</td></tr>
+        <tr><td class="rank">4等</td><td><b>次回使える1,000円券</b></td><td>次回来店時のお会計で1,000円引き</td></tr>
+        <tr><td class="rank">5等</td><td><b>500円無料券</b></td><td>次回来店時のお会計で500円引き</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <b>当選確率は覚えなくてOK。</b>確率はお客様のガチャ画面に表示されます。聞かれたら「画面に出てますよ」と一緒に見てください。<b>スタッフが確率を勝手に説明したり、盛って言ったりしない</b>こと（景品表示法に関わります）。
+  </div>
+
+  <div class="warn">
+    <div class="h"><span>!</span>「特典の利用条件はスタッフにご確認ください」＝聞かれるのは私たち</div>
+    <p>POPの一番下にこう書いてあります。つまり条件を聞かれるのはスタッフです。下の4点は<b>店長に確認して、答えを共有しておいてください</b>。あいまいなまま案内すると、お客様とのトラブルになります。</p>
+  </div>
+  <div class="check" id="cond">
+    <label><input type="checkbox" data-k="d1"><span>3等コーティング無料券の<b>対象メニュー</b>と、当日施術できる条件を確認した</span></label>
+    <label><input type="checkbox" data-k="d2"><span>4等・5等の券の<b>有効期限</b>を確認した</span></label>
+    <label><input type="checkbox" data-k="d3"><span>他のクーポン・キャンペーンとの<b>併用ができるか</b>を確認した</span></label>
+    <label><input type="checkbox" data-k="d4"><span>1等ReFaが当たったときの<b>渡し方・在庫の場所</b>を確認した</span></label>
+  </div>
+
+  <div class="note">
+    <b>なぜ「ハズレなし」にできるのか。</b>ドロポンのルールで、いちばん下の賞は<b>ガチャ1回分（500円）以上の価値</b>にしないといけません。だから5等が500円無料券になっています。お客様は500円払って500円分以上が必ず返ってくる＝<b>損をしない</b>。ここを堂々と言えるのが、このガチャの一番の武器です。
+  </div>
+
+  <div class="note">
+    <b>景品は入れ替えできます。</b>季節やイベントに合わせた期間限定景品を入れると、リピーターの飽き防止になります（変更は店長が管理画面から申請 → ドロポンの承認が必要）。SNSでシェアしたくなる景品画像を設定するのも効果的です。
+  </div>
+</section>
+
+<!-- なぜ儲かる -->
+<section id="mouke">
+  <div class="sec-head"><span class="sec-num">07</span><h2>なんでお店が儲かるの？</h2></div>
+  <p class="sec-sub">スタッフが知らなくても仕事はできますが、知っていると声かけに自信が出ます。理屈は<b>福袋と同じ</b>です。中身の総額より売値が高くなるように設計しているので、回れば回るほど利益が出ます。</p>
+
+  <h3>売上が増える6つの入口</h3>
+  <ol class="flow">
+    <li><div><b>ガチャそのものの利益</b><span>ガチャ売上から景品原価を引いた分が残る設計になっています。</span></div></li>
+    <li><div><b>割引券を使いに再来店</b><span>券を持っているお客様は使いに来ます。来店回数が積み上がります。</span></div></li>
+    <li><div><b>使われなかった割引券</b><span>有効期限内に使われなければ、入ってきたガチャ代がそのまま利益になります。</span></div></li>
+    <li><div><b>券を友達に譲れる</b><span>譲渡機能があるので、口コミ経由で新規のお客様が来ます。</span></div></li>
+    <li><div><b>マップ検索からの新規</b><span>ドロポンのアプリで「近くでガチャが回せる店」を探して来る人がいます。</span></div></li>
+    <li><div><b>ドロポン社の販促</b><span>特賞や初回コインプレゼントなど、ドロポン社の負担でガチャの回転を後押しします。</span></div></li>
+  </ol>
+
+  <h3>資料のモデルケース</h3>
+  <p class="small">前提：ガチャ1回500円／月間ユーザー100名／1人平均2回＝月300回／景品の平均原価率45%／顧客平均単価4,000円。<b>実際の数字はお店の設定と回転数で変わります。</b></p>
+  <div class="money">
+    <div class="m-row"><span class="k">ガチャ売上（月）</span><span class="v">150,000円</span></div>
+    <div class="m-row"><span class="k">お店の取り分 80%</span><span class="v">120,000円</span></div>
+    <div class="m-row"><span class="k">景品原価（45%）</span><span class="v">−54,000円</span></div>
+    <div class="m-row"><span class="k">ガチャの粗利</span><span class="v">66,000円</span></div>
+    <div class="m-row"><span class="k">割引券で再来店した分の粗利</span><span class="v">183,750円</span></div>
+    <div class="m-row"><span class="k">使われなかった券の利益</span><span class="v">24,000円</span></div>
+    <div class="m-row"><span class="k">友達に譲られて来た新規の粗利</span><span class="v">36,750円</span></div>
+    <div class="m-row"><span class="k">合計（月間想定粗利）</span><span class="v">310,500円</span></div>
+  </div>
+  <div class="total">
+    <span class="k">年間の想定粗利</span>
+    <span class="v">約372万円<small>ガチャ単体（年約80万円）の約4.7倍</small></span>
+  </div>
+  <p class="small">※資料上の想定値です。回転数・原価率・割引券の使用率が変われば結果も変わります。営業資料の試算なので、社内では「上限イメージ」として扱ってください。</p>
+</section>
+
+<!-- 店長向け -->
+<section id="tencho">
+  <div class="sec-head"><span class="sec-num">08</span><h2>店長・管理者向け</h2></div>
+  <p class="sec-sub">スタッフはここを読まなくてもOKです。管理画面の操作・入金・料金の話をまとめています。</p>
+
+  <h3>管理画面</h3>
+  <dl class="kv">
+    <div><dt class="k">ログイン</dt><dd class="v"><a href="https://store.dropon.jp/login">https://store.dropon.jp/login</a><br>招待メール（ドロポンアカウント発行のお知らせ）に書かれたID（メールアドレス）と初期パスワードを入力。</dd></div>
+    <div><dt class="k">パスワード変更</dt><dd class="v">「利用者一覧 &gt; パスワード再設定」から変更できます。初回ログイン後にすぐ変更を。</dd></div>
+    <div><dt class="k">ガチャの内容確認</dt><dd class="v">「ガチャ一覧」→ 対象ガチャの「詳細」で現在の登録内容が見られます。</dd></div>
+  </dl>
+
+  <h3>ガチャの内容を変更する手順</h3>
+  <ol class="flow">
+    <li><div><b>ガチャ一覧から「編集」</b><span>「ガチャ一覧」で対象を検索 →「操作」→「編集」をクリック。</span></div></li>
+    <li><div><b>編集して「申請する」</b><span>承認されるまでは、申請前のガチャがそのまま動き続けます。</span></div></li>
+    <li><div><b>反映タイミングを2つから選ぶ</b><span>「公開開始日時に自動で公開する」か「承認後、自分で公開ボタンを押して公開する」。</span></div></li>
+    <li><div><b>運営の承認メールを待つ</b><span>承認されるとメールで通知が来ます。</span></div></li>
+    <li><div><b>「編集」から「公開」をON</b><span>自動公開を選んだ場合はこの作業は不要です。</span></div></li>
+  </ol>
+  <div class="warn">
+    <div class="h"><span>!</span>QRコードはガチャを公開してから有効になる</div>
+    <p>「公開」をONにするまで、QRコードを読み取ってもお客様には画面が表示されません。店内に設置する前に、必ず公開設定を確認してください。</p>
+  </div>
+
+  <h3>QRコードの設置と動作確認</h3>
+  <ol class="flow">
+    <li><div><b>卓上POPスタンドにQRシールを貼る</b><span>スターターキットに同梱されています。</span></div></li>
+    <li><div><b>置き場所を選ぶ</b><span>メニュー等で隠れる場所は避け、卓上・レジ横・待合スペースなど視線に入る場所へ。</span></div></li>
+    <li><div><b>設置後に自分で読み取る</b><span>スマホのカメラでQRを読み、①ガチャ画面が開くか ②景品リストが正しいか ③店舗名に間違いがないか、の3点を確認。</span></div></li>
+  </ol>
+
+  <h3>入金スケジュール（精算は月2回）</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>対象期間</th><th>締め日</th><th>振込日</th></tr></thead>
+      <tbody>
+        <tr><td>毎月1日〜15日</td><td>15日</td><td><b>当月末日</b></td></tr>
+        <tr><td>毎月16日〜月末</td><td>末日</td><td><b>翌月15日</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">※振込日が土日祝の場合は翌営業日の振込になります。</p>
+  <dl class="kv">
+    <div><dt class="k">入金額の確認</dt><dd class="v">管理画面「精算一覧」で入金額・入金予定日が見られます。</dd></div>
+    <div><dt class="k">売上明細</dt><dd class="v">「売上明細 &gt; 売上レポート」から月次・日次レポートを確認。</dd></div>
+    <div><dt class="k">請求書</dt><dd class="v">「精算一覧 &gt; 支払明細書」から、インボイス（適格請求書）対応の支払明細書兼請求書をPDFでダウンロード・印刷できます。</dd></div>
+  </dl>
+
+  <h3>お役立ち機能（管理画面 &gt; お役立ち機能）</h3>
+  <dl class="kv">
+    <div><dt class="k">店舗QR印刷</dt><dd class="v">設置したQRが汚れて読み取りにくくなったら、何度でも印刷し直せます。</dd></div>
+    <div><dt class="k">集客ガイド</dt><dd class="v">SNS投稿テンプレートと、お客様に参加してもらうためのアドバイス。</dd></div>
+    <div><dt class="k">素材集</dt><dd class="v">キャラクター「どろろん」の素材、ロゴ、SNS投稿用画像、ポスターなど。</dd></div>
+  </dl>
+
+  <h3>料金（2026年5月時点の資料より）</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>項目</th><th class="num">通常価格</th><th class="num">リリースキャンペーン</th></tr></thead>
+      <tbody>
+        <tr><td>初期導入費用</td><td class="num">198,000円</td><td class="num">50,000円（75%OFF）</td></tr>
+        <tr><td>他店舗紹介をした場合</td><td class="num">—</td><td class="num">30,000円（85%OFF）</td></tr>
+        <tr><td>月額利用料</td><td class="num">14,800円/月</td><td class="num">永年無料</td></tr>
+        <tr><td>ガチャ売上の手数料</td><td class="num">20%</td><td class="num">20%（売上ゼロなら手数料ゼロ）</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">※すべて税別。紹介は1店舗につき10,000円キャッシュバック（上限20,000円）。キャンペーンは期間限定と記載されています。含まれるもの：スターターキット（QRコードPOP・アクリル板・チラシ）、アカウント設定、ガチャ設計コンサルティング、導入後の運用サポート、プッシュ通知・データ分析機能、カスタマーサポート。申込からガチャ公開まで最短2〜3週間。</p>
+</section>
+
+<!-- 困った時 -->
+<section id="komatta">
+  <div class="sec-head"><span class="sec-num">09</span><h2>困ったときの連絡先</h2></div>
+  <p class="sec-sub">お客様の前で分からないことが出たら、勝手に判断せず店長へ。店長でも分からなければドロポンのサポートデスクへ。</p>
+  <dl class="kv">
+    <div><dt class="k">メールサポート</dt><dd class="v"><a href="mailto:dropon_support@dropon.co.jp">dropon_support@dropon.co.jp</a><br>24時間受付。返信は営業日以降、順次。</dd></div>
+    <div><dt class="k">電話サポート</dt><dd class="v"><a href="tel:05052916409">050-5291-6409</a>（平日 10:00〜19:00）</dd></div>
+    <div><dt class="k">ヘルプセンター</dt><dd class="v"><a href="https://store.dropon.jp/help/faq">https://store.dropon.jp/help/faq</a>（よくある質問）</dd></div>
+    <div><dt class="k">管理画面から問い合わせ</dt><dd class="v">「問い合わせ」&gt;「問い合わせ送信」からも送れます。</dd></div>
+  </dl>
+
+  <div class="warn">
+    <div class="h"><span>?</span>お客様に「これ当たったんだけど」と言われて画面が分からないとき</div>
+    <p>あわてず、お客様のスマホの<b>景品名</b>と<b>有効期限</b>を一緒に見てください。うちの店の引換券なら、あとは「利用する」を押してもらって、うちのQRを読み取ってもらうだけです。判断に迷う券（他店のもの・期限切れ）は、その場で渡さずに店長へ確認を。</p>
+  </div>
+</section>
+
+<footer>
+  <b>この資料の出どころ</b>
+  <div class="src">
+    株式会社ドロップオン「ドロポン 営業資料」（2026年5月22日版）および「ドロポン サポートマニュアル」（2026年5月25日版）を、eye mor. スタッフ向けに再構成したものです。数字・手順は原資料の記載に沿っています。景品内容・ガチャ単価はお店ごとの設定なので、確定後にこのページを更新してください。<br>
+    原資料と食い違いが出た場合は、原資料とドロポンサポートデスクの案内が優先です。
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY = 'dropon-staff-check';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e) { saved = {}; }
+  var boxes = document.querySelectorAll('.check input[type=checkbox]');
+  Array.prototype.forEach.call(boxes, function(el){
+    if (saved[el.dataset.k]) el.checked = true;
+    el.addEventListener('change', function(){
+      saved[el.dataset.k] = el.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch(e) {}
+    });
+  });
+})();
+</script>
+</body>
+</html>
